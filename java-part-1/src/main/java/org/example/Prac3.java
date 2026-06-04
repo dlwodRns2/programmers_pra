@@ -4,16 +4,20 @@ import java.util.Scanner;
 
 public class Prac3 {
     static final int COKE = 500, CIDER = 700, FANTA = 300, WATER = 200;
+    //잔액 부족 메시지 출력
     public static void printWarn(){
         System.out.println("잔액이 부족합니다.");
     }
+    //현재 잔액 출력
     public static void printmoney(int money){
         System.out.println("잔액 : "+money);
     }
 
+    //잔액과 물건 가격 비교
     public static boolean calc(int totalMoney, int price){
         return totalMoney<price;
     }
+
     public static void printMenu(int totalMoney){
         int coke=0,cider=0,fanta=0,water=0;
         System.out.println("================================= 자판기 ================================");
@@ -24,8 +28,10 @@ public class Prac3 {
         Scanner sc = new Scanner(System.in);
 
 
+        //[6] 종료 입력 전까지 반복
         while(sc.hasNextInt()){
             int next = sc.nextInt();
+            //[6] 종료 입력 시, 반복문 종료
             if(next==6){
                 System.out.println("자판기를 종료합니다.");
                 break;
@@ -72,6 +78,7 @@ public class Prac3 {
                     printmoney(totalMoney);
                 }
             }
+
             else if(next==5){
                 System.out.println("넣을 금액을 입력해주세요.");
                 int money = sc.nextInt();
@@ -80,11 +87,13 @@ public class Prac3 {
             }
 
         }
+        //반복문 종료 후, 구매한 물품과 거스름돈 출력
         System.out.println("콜라 "+coke+"개, 사이다 "+cider+"개, 환타 "+fanta+"개, 물 "+water+"개 구매완료");
         System.out.println("거스름돈 "+totalMoney+"원");
     }
     static void main(String[] args) {
         Scanner sc  = new Scanner(System.in);
+        System.out.println("현재 잔액 입력 ");
         int money = sc.nextInt();
         printMenu(money);
     }
