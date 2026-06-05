@@ -1,4 +1,4 @@
-package org.example;
+package org.example.accountBookPrac;
 
 public class Item {
     private String name;
