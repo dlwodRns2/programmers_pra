@@ -121,6 +121,7 @@ public class K_member_management {
         }
         return false;
     }
+    
     //2. 회원 조회(이메일로 조회)
     public static void selectEmail(String[][] members){
         System.out.println("이메일을 입력해주세요.");
