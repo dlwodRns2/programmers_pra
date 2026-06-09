@@ -8,7 +8,7 @@ public class K_member_management {
     static int totalCnt = 0; //이 프로그램에서 저장할 수 있는 회원 수
     static int memberCnt = 0; //실제 회원 수
     static Scanner sc = new Scanner(System.in);
-    static  ArrayList<Member> memberList;
+    static ArrayList<Member> memberList;
 
     //확장 도전 과제 4: memberList를 member.dat 파일로 저장(프로젝트 루트/data 에 저장)
     static void saveToFile(ArrayList<Member> memberList){
