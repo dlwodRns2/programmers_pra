@@ -44,33 +44,33 @@ public class Main {
 
 
         //2. MyTree Test
-//        MyTree tree = new MyTree();
-//        int[] values = {50,30,70,20,40,60,80};
-//        for(int v:values){
-//            tree.insert(v);
-//        }
-//        tree.preOrder();
-//        tree.inOrder();
-//        tree.postOrder();
-//
-//        //3. MyTreeMap Test
-//        MyTreeMap myTreeMap = new MyTreeMap();
-//        myTreeMap.put("apple",1);
-//        myTreeMap.put("banana",2);
-//        myTreeMap.put("cherry",3);
-//        myTreeMap.put("www",4);
-//
-//        System.out.println(myTreeMap.get("cherry"));
-//        System.out.println(myTreeMap.get("watermelon"));
-//
-//        myTreeMap.printSorted();
-//
-//        System.out.println(myTreeMap.containsKey("apple"));
-//        System.out.println(myTreeMap.containsKey("watermelon"));
-//        System.out.println(myTreeMap.firstKey() + " "+ myTreeMap.lastKey());
-//
-//        System.out.println(myTreeMap.remove("banana"));
-//        myTreeMap.printSorted();
+        MyTree tree = new MyTree();
+        int[] values2 = {50,30,70,20,40,60,80};
+        for(int v:values2){
+            tree.insert(v);
+        }
+        tree.preOrder();
+        tree.inOrder();
+        tree.postOrder();
+
+        //3. MyTreeMap Test
+        MyTreeMap myTreeMap = new MyTreeMap();
+        myTreeMap.put("apple",1);
+        myTreeMap.put("banana",2);
+        myTreeMap.put("cherry",3);
+        myTreeMap.put("www",4);
+
+        System.out.println(myTreeMap.get("cherry"));
+        System.out.println(myTreeMap.get("watermelon"));
+
+        myTreeMap.printSorted();
+
+        System.out.println(myTreeMap.containsKey("apple"));
+        System.out.println(myTreeMap.containsKey("watermelon"));
+        System.out.println(myTreeMap.firstKey() + " "+ myTreeMap.lastKey());
+
+        System.out.println(myTreeMap.remove("banana"));
+        myTreeMap.printSorted();
     }
 
 }
