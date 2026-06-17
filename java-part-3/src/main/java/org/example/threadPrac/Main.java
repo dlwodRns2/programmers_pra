@@ -1,4 +1,4 @@
-package org.example;
+package org.example.threadPrac;
 
 public class Main {
     static void main(String[] args) {

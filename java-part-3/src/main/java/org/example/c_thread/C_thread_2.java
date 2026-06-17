@@ -1,4 +1,4 @@
-package org.example;
+package org.example.c_thread;
 
 //* start() vs run()
 

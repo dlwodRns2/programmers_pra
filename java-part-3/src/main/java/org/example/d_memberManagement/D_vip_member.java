@@ -1,4 +1,4 @@
-package org.example;
+package org.example.d_memberManagement;
 
 public class D_vip_member implements D_member{
     private String name,email,phone;

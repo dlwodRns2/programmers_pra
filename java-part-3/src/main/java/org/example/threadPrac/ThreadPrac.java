@@ -1,7 +1,5 @@
-package org.example;
+package org.example.threadPrac;
 
-import javax.swing.plaf.synth.SynthSliderUI;
-import javax.swing.plaf.synth.SynthSpinnerUI;
 import java.util.Scanner;
 
 class PrintDash extends Thread{

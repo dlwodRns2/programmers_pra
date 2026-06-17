@@ -1,4 +1,4 @@
-package org.example;
+package org.example.d_memberManagement;
 
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package org.example;
+package org.example.c_thread;
 
 //* 싱글쓰레드 vs 멀티쓰레드
 

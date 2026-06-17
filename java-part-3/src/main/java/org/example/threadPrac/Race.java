@@ -1,4 +1,4 @@
-package org.example;
+package org.example.threadPrac;
 
 public class Race {
     private volatile boolean over = false;

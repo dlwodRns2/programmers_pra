@@ -1,4 +1,4 @@
-package org.example;
+package org.example.c_thread;
 
 //* 멀티 스레딩이란?
 //하나의 프로그램 안에서 여러 작업을 동시에 돌리는 것.

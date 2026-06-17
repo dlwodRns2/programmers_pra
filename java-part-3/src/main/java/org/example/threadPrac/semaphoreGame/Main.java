@@ -1,4 +1,4 @@
-package org.example.semaphoreGame;
+package org.example.threadPrac.semaphoreGame;
 
 public class Main {
     static void main(String[] args) {

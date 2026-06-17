@@ -1,4 +1,4 @@
-package org.example;
+package org.example.c_thread;
 
 //* 세마포어
 //동시에 임계 영역에 들어갈 수 있는 쓰레드 수를 제한하는 잠금 도구

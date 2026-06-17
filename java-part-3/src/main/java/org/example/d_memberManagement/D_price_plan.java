@@ -1,4 +1,4 @@
-package org.example;
+package org.example.d_memberManagement;
 
 public enum D_price_plan {
     LITE(10),

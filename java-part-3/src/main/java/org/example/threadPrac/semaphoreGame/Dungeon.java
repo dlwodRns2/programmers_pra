@@ -1,4 +1,4 @@
-package org.example.semaphoreGame;
+package org.example.threadPrac.semaphoreGame;
 
 import java.util.concurrent.Semaphore;
 

@@ -1,4 +1,4 @@
-package org.example;
+package org.example.c_thread;
 
 //* 데몬 쓰레드
 //메인 쓰레드의 작업을 뒤에서 도와주는 보조 쓰레드
