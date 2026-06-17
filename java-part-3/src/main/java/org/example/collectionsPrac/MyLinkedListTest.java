@@ -1,4 +1,4 @@
-package org.example;
+package org.example.collectionsPrac;
 
 public class MyLinkedListTest {
     static void main(String[] args) {

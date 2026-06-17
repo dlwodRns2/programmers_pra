@@ -1,4 +1,4 @@
-package org.example;
+package org.example.bfs_dfs;
 
 import java.util.LinkedList;
 import java.util.Stack;

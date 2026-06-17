@@ -1,4 +1,4 @@
-package org.example;
+package org.example.collectionsPrac;
 
 import java.util.Arrays;
 

@@ -1,4 +1,4 @@
-package org.example;
+package org.example.collectionsPrac;
 
 public class MyTreeMap {
     static class Node {
