@@ -131,7 +131,8 @@ public class ThreadPrac {
         new Scanner(System.in).nextLine();
         t3.interrupt();
 
-        //5. yield : 양보의 개념. 쓰레드가 CPU에 다른 쓰레드 먼저 실행해달라고
+        //5. yield :
+        //양보의 개념. 쓰레드가 CPU에 다른 쓰레드 먼저 실행해달라고
         //전달하는 것. => CPU가 무시할 수 있다.
         new YieldThread("쓰레드1").start();
         new YieldThread("쓰레드2").start();
