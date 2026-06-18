@@ -1,4 +1,4 @@
-package org.example.threadPrac;
+package org.example.threadPrac.snail;
 
 public class Race {
     private volatile boolean over = false;
