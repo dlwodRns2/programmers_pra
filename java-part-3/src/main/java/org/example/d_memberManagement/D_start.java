@@ -47,7 +47,7 @@ public class D_start {
                         break;
                     }
 
-                    D_member memeber = ( grade == 2 )
+                    Member memeber = ( grade == 2 )
                             ? new D_vip_member(name, email, phone)
                             : new D_normal_member(name, email, phone);
 
@@ -57,7 +57,7 @@ public class D_start {
                 case 2:
                     System.out.println("[조회] 이메일");
 
-                    D_member byEmail = manager.findByEmail(sc.nextLine());
+                    Member byEmail = manager.findByEmail(sc.nextLine());
 
                     if (byEmail == null)  System.out.println("찾으시는 정보가 없습니다.");
                     else byEmail.printInfo();
@@ -66,7 +66,7 @@ public class D_start {
                 case 3:
                     System.out.println("[조회] 이름");
 
-                    D_member byName = manager.findByName(sc.nextLine());
+                    Member byName = manager.findByName(sc.nextLine());
 
                     if (byName == null)  System.out.println("찾으시는 정보가 없습니다.");
                     else byName.printInfo();

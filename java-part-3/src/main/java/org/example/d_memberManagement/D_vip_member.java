@@ -1,6 +1,6 @@
 package org.example.d_memberManagement;
 
-public class D_vip_member implements D_member{
+public class D_vip_member implements Member {
     private String name,email,phone;
 
     public D_vip_member(String name, String email, String phone) {

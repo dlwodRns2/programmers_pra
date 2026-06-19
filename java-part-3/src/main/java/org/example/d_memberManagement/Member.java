@@ -1,6 +1,6 @@
 package org.example.d_memberManagement;
 
-public interface D_member {
+public interface Member {
     String getName();
     String getEmail();
     String getPhone();

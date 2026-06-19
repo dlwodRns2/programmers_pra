@@ -6,7 +6,7 @@ import java.util.List;
 
 public class D_member_manager {
 
-    private final List<D_member> members = new ArrayList<>();
+    private final List<Member> members = new ArrayList<>();
     private final int capacity;
 
     public D_member_manager(int capacity) {
@@ -18,7 +18,7 @@ public class D_member_manager {
     }
 
     public boolean existsEmail(String email) {
-        for (D_member member : members) {
+        for (Member member : members) {
             if (member.getEmail().equals(email)) {
                 return true;
             }
@@ -27,12 +27,12 @@ public class D_member_manager {
         return false;
     }
 
-    public void add(D_member member) {
+    public void add(Member member) {
         members.add(member);
     }
 
-    public D_member findByEmail(String email) {
-        for (D_member member : members) {
+    public Member findByEmail(String email) {
+        for (Member member : members) {
             if (member.getEmail().equals(email)) {
                 return member;
             }
@@ -40,8 +40,8 @@ public class D_member_manager {
         return null;
     }
 
-    public D_member findByName(String name) {
-        for (D_member member : members) {
+    public Member findByName(String name) {
+        for (Member member : members) {
             if (member.getName().equals(name)) {
                 return member;
             }
@@ -50,7 +50,7 @@ public class D_member_manager {
     }
 
     public boolean update(String email, String name, String phone, String newEmail) {
-        D_member member = findByEmail(email);
+        Member member = findByEmail(email);
         if (member != null) {
             member.update(name, newEmail, phone);
             return true;
@@ -60,7 +60,7 @@ public class D_member_manager {
     }
 
     public boolean delete(String email) {
-        D_member byEmail = findByEmail(email);
+        Member byEmail = findByEmail(email);
         if (byEmail == null) return false;
         members.remove(byEmail);
         return true;
@@ -72,7 +72,7 @@ public class D_member_manager {
             return;
         }
 
-        for (D_member member : members) {
+        for (Member member : members) {
             member.printInfo();
         }
     }
