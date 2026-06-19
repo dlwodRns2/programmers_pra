@@ -1,4 +1,4 @@
-package org.example;
+package org.example.g_account_book_file;
 
 import java.util.Scanner;
 

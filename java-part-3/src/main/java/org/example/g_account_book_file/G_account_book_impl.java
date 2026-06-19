@@ -1,4 +1,4 @@
-package org.example;
+package org.example.g_account_book_file;
 
 import java.util.Scanner;
 
@@ -6,14 +6,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Scanner;
 
 import java.io.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 public class G_account_book_impl implements G_account_book {
 
