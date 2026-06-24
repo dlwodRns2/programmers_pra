@@ -59,7 +59,7 @@ select * from emp order by DEPTNO asc, sal desc;
 select * from emp where EMPNO=7782;
 
 #5. 부서번호가 20이거나 사원번호가 7782인 경우
-select * from emp where DEPTNO=20 or EMPNO-7782;
+select * from emp where DEPTNO=20 or EMPNO=7782;
 #6. 부서번호가 20이면서 연봉이 1000보다 높은 직원
 select * from emp where DEPTNO=20 and sal>1000;
 
