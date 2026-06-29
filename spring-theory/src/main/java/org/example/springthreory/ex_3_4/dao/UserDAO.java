@@ -1,39 +1,28 @@
-package org.example.springthreory.ch03.ex_3_3.dao;
+package org.example.springthreory.ex_3_4.dao;
 
-import org.example.springthreory.ch03.ex_3_3.domain.User;
+import org.example.springthreory.ex_3_4.domain.User;
 
+import javax.swing.plaf.nimbus.State;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-// * 익명 내부 클래스
-public class UserDAO_2 {
+public class UserDAO {
+    //구체 클래스 의존 : 강한 결합 //반드시 필요(connectionMake)
+    //필요에 따라서는 구체클래스를 의존해도 좋결
+    private JdbcContext jdbcContext;
 
-    private SimpleConnectionMaker simpleConnectionMaker;
-
-    public UserDAO_2(SimpleConnectionMaker simpleConnectionMaker) {
-        this.simpleConnectionMaker = simpleConnectionMaker;
+    public UserDAO(JdbcContext jdbcContext) {
+        this.jdbcContext=jdbcContext;
     }
 
-    protected UserDAO_2() {}
-
-    public void jdbcContextWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException, ClassNotFoundException {
-        try (
-                Connection conn = simpleConnectionMaker.makeNewConnection();
-                PreparedStatement pstmt = statementStrategy.makeStatement(conn); // 변하는 부분을 전략에 위임
-        ) {
-            pstmt.executeUpdate();
-        }
-    }
+    public UserDAO(){}
 
     public void add(User user) throws ClassNotFoundException, SQLException {
 
-        //익명 클래스를 통한 해결
         StatementStrategy strategy = new StatementStrategy() {
-
             @Override
             public PreparedStatement makeStatement(Connection conn) throws SQLException {
-
                 PreparedStatement pstmt = conn.prepareStatement(
                         "insert into users (id,name,password) values (?,?,?)"
                 );
@@ -44,20 +33,18 @@ public class UserDAO_2 {
                 return pstmt;
             }
         };
-        jdbcContextWithStatementStrategy( strategy );
+        jdbcContext.workWithStatementStrategy(strategy);
     }
 
     public void deleteAll() throws SQLException, ClassNotFoundException {
-
         StatementStrategy strategy = new StatementStrategy() {
             @Override
             public PreparedStatement makeStatement(Connection conn) throws SQLException {
-                return conn.prepareStatement("DELETE FROM users");
+                return conn.prepareStatement("delete from users");
             }
         };
 
-        jdbcContextWithStatementStrategy( strategy );
+       jdbcContext.workWithStatementStrategy(strategy);
     }
-
 
 }
