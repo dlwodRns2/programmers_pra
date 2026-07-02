@@ -1,4 +1,4 @@
-package org.example.springthreory;
+package org.example.springthreory.decoratorPrac;
 
 public class LoggingNotificationSender implements NotificationSender{
     private final NotificationSender delegate;

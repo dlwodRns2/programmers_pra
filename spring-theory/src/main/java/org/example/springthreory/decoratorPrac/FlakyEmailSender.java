@@ -1,4 +1,4 @@
-package org.example.springthreory;
+package org.example.springthreory.decoratorPrac;
 
 public class FlakyEmailSender implements NotificationSender{
     private int attempt=0;

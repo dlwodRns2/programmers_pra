@@ -1,4 +1,4 @@
-package org.example.springthreory;
+package org.example.springthreory.decoratorPrac;
 
 public class RetryNotificationSender implements NotificationSender{
     private NotificationSender sender;
