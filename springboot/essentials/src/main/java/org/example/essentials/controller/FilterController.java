@@ -32,9 +32,20 @@ package org.example.essentials.controller;
 //   - 정리 : 화면(HTML)을 보여 주려면 @Controller,
 //     데이터(JSON/문자열)를 내려 주려면 @RestController 를 쓴다.
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 // * 필터
 @RestController
 public class FilterController {
+    @GetMapping("/hello")
+    public String hello(){
+        System.out.println("hello");
+        return "Hello World!";
+    }
+
+    @GetMapping("/api/data")
+    public String data(){
+        return "data";
+    }
 }
