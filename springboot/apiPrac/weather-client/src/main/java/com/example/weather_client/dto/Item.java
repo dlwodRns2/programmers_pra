@@ -1,4 +1,17 @@
 package com.example.weather_client.dto;
 
-public class Item {
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class Item{
+    private String baseDate;
+    private String baseTime;
+    private String category;
+    private int nx;
+    private int ny;
+    private String obsrValue;
 }

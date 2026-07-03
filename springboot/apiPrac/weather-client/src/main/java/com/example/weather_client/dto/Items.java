@@ -4,10 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
-public class Response{
-    private Header header;
-    private Body body;
+public class Items {
+    private List<Item> item;
 }
