@@ -1,9 +1,13 @@
 package org.example.boardprac.controller;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.example.boardprac.constant.SessionConst;
 import org.example.boardprac.domain.entity.Member;
 import org.example.boardprac.dto.MemberJoinRequestDto;
 import org.example.boardprac.dto.MemberJoinResponseDto;
+import org.example.boardprac.dto.LoginRequestDto;
+import org.example.boardprac.dto.LoginResponseDto;
 import org.example.boardprac.service.MemberService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,4 +25,17 @@ public class MemberApiController {
         memberService.join(dto);
         return new MemberJoinResponseDto("/members/login");
     }
+    @PostMapping("/login")
+    public LoginResponseDto login(
+            @RequestBody LoginRequestDto dto,
+            HttpSession session){
+        return memberService.login(dto)
+                .map(member ->{
+                    session.setAttribute(SessionConst.USER_ID,member.getUserId());
+                    session.setAttribute(SessionConst.USER_NAME, member.getUserName());
+                    return LoginResponseDto.success();
+                })
+                .orElseGet(LoginResponseDto::fail);
+    }
+
 }
