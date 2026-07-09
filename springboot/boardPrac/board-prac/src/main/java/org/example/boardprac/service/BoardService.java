@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.boardprac.domain.entity.Board;
 import org.example.boardprac.domain.repository.BoardRepository;
 import org.example.boardprac.domain.repository.MemberRepository;
+import org.example.boardprac.dto.BoardDeleteRequestDto;
+import org.example.boardprac.dto.BoardUpdateRequestDto;
 import org.example.boardprac.dto.BoardWriteRequestDto;
 import org.example.boardprac.exception.BoardNotFountException;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
-
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    private final FileService fileService;
 
     // 최신 글이 위로 오도록 id 내림차순. 화면 page(1~)를 Pageable(0~)로 바꾸려 page - 1
     public List<Board> getBoardList(int page,int size){
@@ -49,29 +49,8 @@ public class BoardService {
     }
 
     @Transactional
-    public String storeFile(MultipartFile file){
-            if(file==null||file.isEmpty()){
-                return null;
-            }
-            try{
-                File dir = new File(uploadDir).getAbsoluteFile();
-                if(!dir.exists()){
-                    dir.mkdirs();
-                }
-
-                String storedName = UUID.randomUUID()+"_"+file.getOriginalFilename();
-                File dest = new File(dir,storedName);
-
-                file.transferTo(dest);
-                return dest.getPath();
-            } catch (IOException e) {
-                throw new IllegalStateException("파일 저장에 실패했습니다.",e);
-            }
-    }
-
-    @Transactional
     public void saveArticle(BoardWriteRequestDto dto){
-        String filePath = storeFile(dto.getFile());
+        String filePath = fileService.storeFile(dto.getFile());
 
         Board board  = Board.builder()
                 .userId(dto.getUserId())
@@ -84,20 +63,26 @@ public class BoardService {
         boardRepository.save(board);
     }
 
-    public Resource downloadFile(String fileName){
-        File file = new File(new File(uploadDir).getAbsoluteFile(), fileName);
-        try {
-            Resource resource = new UrlResource(file.toURI());
-            if(!resource.exists()){
-                throw new BoardNotFountException("파일을 찾을 수 없습니다. fileName = "+fileName);
-            }
-            return resource;
-
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException("파일 경로가 잘못되었습니다."+e);
+    @Transactional
+    public void deleteArticle(Long id, BoardDeleteRequestDto dto){
+        if(!boardRepository.existsById(id)){
+            throw new BoardNotFountException("게시글을 찾을 수 없습니다. id="+ id);
         }
+        boardRepository.deleteById(id);
+        fileService.deleteFile(dto.getFilePath());
     }
 
+    @Transactional
+    public void updateArticle(Long id, BoardUpdateRequestDto dto){
+        Board board = boardRepository.findById(id)
+                .orElseThrow(()->new BoardNotFountException("게시글을 찾을 수 없습니다. id="+id));
 
+        String filePath = board.getFilePath();
+        if(dto.isFileFlag()){
+            fileService.deleteFile(board.getFilePath());
+            filePath= fileService.storeFile(dto.getFile());
+        }
 
+        board.update(dto.getTitle(),dto.getContent(),filePath);
+    }
 }

@@ -36,4 +36,10 @@ public class Board {
     // 안 붙이면 2026-06-24T08:43:00 처럼 'T'가 붙는다 → pattern으로 사람 친화적 표기
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime created;
+
+    public void update(String newTitle, String newContent, String filePath){
+        this.title = newTitle;
+        this.content=newContent;
+        this.filePath=filePath;
+    }
 }

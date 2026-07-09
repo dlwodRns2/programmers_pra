@@ -2,10 +2,9 @@ package org.example.boardprac.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.boardprac.domain.entity.Board;
-import org.example.boardprac.dto.BoardDetailResponseDto;
-import org.example.boardprac.dto.BoardListResponseDto;
-import org.example.boardprac.dto.BoardWriteRequestDto;
+import org.example.boardprac.dto.*;
 import org.example.boardprac.service.BoardService;
+import org.example.boardprac.service.FileService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,6 +20,7 @@ import java.util.List;
 @RequestMapping("/api/boards")
 public class BoardApiController {
     private final BoardService boardService;
+    private final FileService fileService;
 
     @GetMapping
     public BoardListResponseDto getBoardList(@RequestParam(defaultValue = "1") int page,
@@ -52,7 +52,7 @@ public class BoardApiController {
 
     @GetMapping("/file/download/{fileName}")
     public ResponseEntity<Resource> download(@PathVariable String fileName){
-        Resource resource = boardService.downloadFile(fileName);
+        Resource resource = fileService.downloadFile(fileName);
 
         String encoded = URLEncoder.encode(resource.getFilename(), StandardCharsets.UTF_8)
                 .replaceAll("\\+","%20");
@@ -69,11 +69,19 @@ public class BoardApiController {
         boardService.saveArticle(dto);
     }
 
-//    @DeleteMapping("api/boards/{id}")
-//    public void deleteArticle(
-//            @PathVariable Long id,
-//            @RequestBody String filePath
-//    ){
-//
-//    }
+    @DeleteMapping("/{id}")
+    public void deleteArticle(
+            @PathVariable Long id,
+            @RequestBody BoardDeleteRequestDto dto
+            ){
+        boardService.deleteArticle(id, dto);
+    }
+
+    @PutMapping("/{id}")
+    public void updateArticle(
+            @PathVariable Long id,
+            @ModelAttribute BoardUpdateRequestDto dto
+            ){
+        boardService.updateArticle(id,dto);
+    }
 }
