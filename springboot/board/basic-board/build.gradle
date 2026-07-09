@@ -33,6 +33,8 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testAnnotationProcessor 'org.projectlombok:lombok'
+
+    testRuntimeOnly 'com.h2database:h2' // @DataJpaTest 용 인메모리 DB (테스트 전용)
 }
 
 tasks.named('test') {
