@@ -4,9 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.example.boardprac.domain.entity.Board;
 import org.example.boardprac.dto.BoardDetailResponseDto;
 import org.example.boardprac.dto.BoardListResponseDto;
+import org.example.boardprac.dto.BoardWriteRequestDto;
 import org.example.boardprac.service.BoardService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -42,4 +49,31 @@ public class BoardApiController {
                 .filePath(board.getFilePath())
                 .build();
     }
+
+    @GetMapping("/file/download/{fileName}")
+    public ResponseEntity<Resource> download(@PathVariable String fileName){
+        Resource resource = boardService.downloadFile(fileName);
+
+        String encoded = URLEncoder.encode(resource.getFilename(), StandardCharsets.UTF_8)
+                .replaceAll("\\+","%20");
+
+        //httpStatus : ok, body : resource 담기
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename*=UTF-8''"+encoded)
+                .body(resource);
+    }
+    @PostMapping
+    public void saveArticle(@ModelAttribute BoardWriteRequestDto dto){
+        boardService.saveArticle(dto);
+    }
+
+//    @DeleteMapping("api/boards/{id}")
+//    public void deleteArticle(
+//            @PathVariable Long id,
+//            @RequestBody String filePath
+//    ){
+//
+//    }
 }
