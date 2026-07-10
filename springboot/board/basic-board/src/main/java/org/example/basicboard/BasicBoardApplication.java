@@ -31,7 +31,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //자바 객체(Entity) <-> DB 테이블/행을 자동으로 매핑하고, 우리가 짠 코드 대신 SQL을 만들어 실행
 @SpringBootApplication
 public class BasicBoardApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(BasicBoardApplication.class, args);
     }
