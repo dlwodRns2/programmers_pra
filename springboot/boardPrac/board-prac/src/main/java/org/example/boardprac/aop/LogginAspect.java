@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class LogginAspect {
+    //해당 경로 안의 모든 메서드에 대해서 적용하겠다
     @Pointcut("execution(* org.example.boardprac.controller..*(..))")
     public void controllerLayer(){}
 

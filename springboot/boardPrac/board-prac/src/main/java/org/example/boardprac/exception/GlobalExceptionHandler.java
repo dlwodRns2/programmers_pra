@@ -22,4 +22,12 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponseDto(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
+
+    //위에서 잡지 못한 모든 예외에 대한 처리 : 예상 못한 예외에 대해서 안전망 역할 수행
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponseDto> handleException(Exception e){
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponseDto(HttpStatus.INTERNAL_SERVER_ERROR.value(),"서버 오류가 발생했습니다."));
+    }
 }
