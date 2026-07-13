@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="board")
@@ -33,6 +35,17 @@ public class Board {
     //-> 2026-01-01 00:00
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime created;
+
+    //역방향 연관관계 : 한 게시글(One)이 여러 댓글(Many)를 가짐(1:N)
+    //* mappedBy = "board"
+    //- 이 관계의 주인은 Comment.Board(Comment객체 내의 Board)(FK를 가진 쪽)이고
+    //여기 Board.comments는 "읽기 전용"
+    //- mappedBy는 "주인이 누구인지"를 알려준다 -> Comment 내의 board 필드가 관계의 주인이라는 뜻
+    //- 이 필드를 왜 두는가? => fetch join
+    //- 이게 있어야 "게시글 하나 + 그 댓글들"을 한 번의 fetch join으로 가져오는 쿼리를 만들 수 있음
+    //- 반대로 이게 없으면, board.getComments()로 댓글을 순회할 수 없음
+    @OneToMany(mappedBy = "board")
+    private List<Comment> comments = new ArrayList<>();
 
     //* 게시글 수정
     //왜 setter 대신 이런 메서드를 두는가? : JPA 변경 감지

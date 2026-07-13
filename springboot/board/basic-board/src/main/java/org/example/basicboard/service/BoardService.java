@@ -3,10 +3,9 @@ package org.example.basicboard.service;
 import lombok.RequiredArgsConstructor;
 import org.example.basicboard.domain.entity.Board;
 import org.example.basicboard.domain.repository.BoardRepository;
-import org.example.basicboard.dto.BoardDeleteRequestDto;
-import org.example.basicboard.dto.BoardUpdateRequestDto;
-import org.example.basicboard.dto.BoardWriteRequestDto;
+import org.example.basicboard.dto.*;
 import org.example.basicboard.exception.BoardNotFountException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -42,10 +41,10 @@ public class BoardService {
         return (int) boardRepository.count();
     }
 
-    //일관성있게 파라미터를 dto로 변경
     @Transactional
     public void saveBoard(BoardWriteRequestDto dto){
         String filePath = fileService.storeFile(dto.getFile());
+
         boardRepository.save(Board.builder()
                         .userId(dto.getUserId())
                         .title(dto.getTitle())
@@ -81,5 +80,10 @@ public class BoardService {
         }
         boardRepository.deleteById(id);
         fileService.deleteFile(dto.getFilePath());
+    }
+
+    public Page<BoardListItemResponseDto> searchBoards(BoardSearchRequestDto dto, Pageable pageable){
+        return boardRepository.searchBoards(dto,pageable);
+
     }
 }

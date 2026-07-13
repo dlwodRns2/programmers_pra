@@ -48,3 +48,14 @@ INSERT INTO board (title, content, user_id, file_path, created) VALUES
                                                                     ('HikariCP 커넥션 풀', '기본으로 딸려온다는 걸 오늘 배웠습니다.', 'lee', NULL, '2026-06-18 16:45:00'),
                                                                     ('SessionConst 상수 분리', '매직 스트링 없애니 훨씬 안전하네요.', 'park', NULL, '2026-06-19 10:55:00'),
                                                                     ('스무 번째 게시글', '시드 데이터 마지막 글입니다. 수고하셨습니다!', 'hong', NULL, '2026-06-20 13:00:00');
+
+-- comment 테이블 생성
+-- board_id 는 board.id 를 가리키는 외래키(FK) - "이 댓글이 어느 게시글 것인지"를 나타낸다
+CREATE TABLE comment (
+                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                         content TEXT NOT NULL,
+                         user_id VARCHAR(30) NOT NULL,
+                         created DATETIME DEFAULT CURRENT_TIMESTAMP,
+                         board_id BIGINT NOT NULL,
+                         CONSTRAINT fk_comment_board FOREIGN KEY (board_id) REFERENCES board (id)
+);
