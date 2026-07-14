@@ -44,7 +44,7 @@ public class Board {
     //- 이 필드를 왜 두는가? => fetch join
     //- 이게 있어야 "게시글 하나 + 그 댓글들"을 한 번의 fetch join으로 가져오는 쿼리를 만들 수 있음
     //- 반대로 이게 없으면, board.getComments()로 댓글을 순회할 수 없음
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     //* 게시글 수정

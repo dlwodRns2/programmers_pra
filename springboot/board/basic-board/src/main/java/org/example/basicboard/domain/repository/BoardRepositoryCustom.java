@@ -2,11 +2,14 @@ package org.example.basicboard.domain.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.example.basicboard.domain.entity.Board;
 import org.example.basicboard.dto.BoardListItemResponseDto;
 import org.example.basicboard.dto.BoardSearchRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 //* 직접 짠 쿼리(QueryDSL)을 위한 커스텀 레포지토리 인터페이스
 //- BoardRepository는 Spring Data가 구현체를 자동으로 생성해주는 인터페이스여서,
@@ -20,4 +23,6 @@ import org.springframework.stereotype.Repository;
 //- BoardRepositoryCustomImpl이 아니라 BoardRepositoryImpl이다 - 붙이는 기준은 "메인 레포지토리 이름"
 public interface BoardRepositoryCustom {
     Page<BoardListItemResponseDto> searchBoards(BoardSearchRequestDto dto, Pageable pageable);
+
+    Optional<Board> findWithComments(Long id);
 }

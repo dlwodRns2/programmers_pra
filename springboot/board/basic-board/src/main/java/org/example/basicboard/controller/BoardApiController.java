@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.basicboard.domain.entity.Board;
 import org.example.basicboard.dto.*;
+import org.example.basicboard.mapper.BoardMapper;
 import org.example.basicboard.service.BoardService;
 import org.example.basicboard.service.FileService;
 import org.springframework.core.io.Resource;
@@ -32,6 +33,7 @@ import java.util.List;
 public class BoardApiController {
     private final BoardService boardService;
     private final FileService fileService;
+    private final BoardMapper boardMapper;
 
     @Operation(
             summary = "게시글 목록 조회",
@@ -113,13 +115,14 @@ public class BoardApiController {
     public void saveBoard(@ModelAttribute BoardWriteRequestDto dto){
         boardService.saveBoard(dto);
     }
+
+
+
     //ResponseEntity는 Http 응답의 3가지를 직접 제어하게 해주는 상자
     //[상태코드] + [헤더] + [본문(body)]의 제어 필요 시, 사용
     //그냥 Resource만 반환하면 파일 내용은 내려가지만,
     //Content-Disposition: attachment 헤더를 붙일 방법이 없음
     //-> 붙이지 않으면 다운로드가 아니라, 파일을 그냥 열어버리고 저장 파일명도 지정 불가
-
-
     // ResponseEntity는 HTTP응답의 3가지를 직접 제어하게 해주는 상자다
     // [상태코드] + [헤더] + [본문(body)]
     // 그냥 Resource만 리턴하면 파일 내용은 내려가지만,
@@ -165,6 +168,21 @@ public class BoardApiController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''"+encodedFileName)
                 .body(resource);
+    }
+    @Operation(summary = "게시글 상세 + 댓글",
+            description = "게시글 한 건과 그에 달린 댓글 목록을 fetch join 으로 한 번에 조회한다.")
+    @GetMapping("/{id}/with-comments")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 id 의 게시글이 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    public BoardWithCommentsResponseDto getBoardWithComments(
+            @Parameter(description = "조회할 게시글 id", example = "1")
+            @PathVariable Long id
+    ){
+        Board board = boardService.getBoardWithComments(id);
+        return boardMapper.toBoardWithCommentsResponseDto(board);
     }
 
     @Operation(summary = "게시글 수정",
