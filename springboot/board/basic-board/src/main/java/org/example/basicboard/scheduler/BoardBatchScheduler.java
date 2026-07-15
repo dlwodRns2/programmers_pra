@@ -47,7 +47,6 @@ public class BoardBatchScheduler {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
-
     // (1) 일일 현황 리포트 - cron 방식
     // cron 표현식 읽는 법 - "0 0 9 * * *" = 매일 09:00:00
     //
