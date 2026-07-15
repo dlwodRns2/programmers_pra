@@ -3,12 +3,14 @@ package org.example.basicboard.domain.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.example.basicboard.domain.entity.Board;
+import org.example.basicboard.dto.BoardAuthorStatsResponseDto;
 import org.example.basicboard.dto.BoardListItemResponseDto;
 import org.example.basicboard.dto.BoardSearchRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 //* 직접 짠 쿼리(QueryDSL)을 위한 커스텀 레포지토리 인터페이스
@@ -25,4 +27,6 @@ public interface BoardRepositoryCustom {
     Page<BoardListItemResponseDto> searchBoards(BoardSearchRequestDto dto, Pageable pageable);
 
     Optional<Board> findWithComments(Long id);
+
+    List<BoardAuthorStatsResponseDto> countBoardsByAuthor(long minCount);
 }

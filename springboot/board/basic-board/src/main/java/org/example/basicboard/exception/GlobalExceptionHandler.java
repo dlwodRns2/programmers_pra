@@ -1,5 +1,6 @@
 package org.example.basicboard.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.basicboard.dto.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 // - 예외를 적절한 HTTP 응답으로 바꾸는 "웹 특화 작업" => @RestControllerAdvice
 //  억지로 AOP로 예외 처리도 가능 하지만, 위의 (1),(2)를 직접 만들어야 해서 비효율적임
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     // @ExceptionHandler : "어떤 예외를 처리할지" 지정한다.
@@ -60,6 +62,7 @@ public class GlobalExceptionHandler {
     //DuplicateUserIdException 예외 처리
     @ExceptionHandler(DuplicateUserIdException.class)
     public ResponseEntity<ErrorResponseDto> duplicateUserIdException(DuplicateUserIdException e){
+        log.warn("409 응답 : {}",e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(
@@ -70,6 +73,7 @@ public class GlobalExceptionHandler {
     //BoardNotFound 예외 처리
     @ExceptionHandler(BoardNotFountException.class)
     public ResponseEntity<ErrorResponseDto> boardNotFountException(BoardNotFountException e){
+        log.warn("404 응답 : {}",e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(
@@ -80,6 +84,7 @@ public class GlobalExceptionHandler {
     //CommentNotFound 예외 처리
     @ExceptionHandler(CommentNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> commentNotFoundException(CommentNotFoundException e){
+        log.warn("404 응답 : {}",e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(
@@ -90,6 +95,7 @@ public class GlobalExceptionHandler {
     //예상 못한 예외에 대해서 안전망 역할 수행
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> exception(Exception e){
+        log.error("500 응답(예상치 못한 예외 발생)",e);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(

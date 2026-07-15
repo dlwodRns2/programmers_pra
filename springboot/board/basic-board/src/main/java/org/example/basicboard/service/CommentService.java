@@ -1,6 +1,7 @@
 package org.example.basicboard.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
 import org.example.basicboard.domain.entity.Board;
 import org.example.basicboard.domain.entity.Comment;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -42,6 +44,7 @@ public class CommentService {
                 .build();
 
         commentRepository.save(comment);
+        log.info("댓글 등록 : commentId = {}, boardId = {}, userId = {}",comment.getId(),boardId,dto.getUserId());
     }
 
     @Transactional

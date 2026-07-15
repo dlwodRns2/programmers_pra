@@ -185,6 +185,17 @@ public class BoardApiController {
         return boardMapper.toBoardWithCommentsResponseDto(board);
     }
 
+    //null이 들어올 수 있으면 -> wrapper : Long
+    //반드시 not null이 들어오면(defaultValue 등) -> primitive : long
+    @Operation(summary = "작성자별 게시글 통계",
+    description = "작성별로 게시글 수를 집계하고, miCount편 이상 쓴 작성자만 많이 쓴 순으로 내려준다.")
+    @GetMapping("/stats/authors")
+    public List<BoardAuthorStatsResponseDto> getAuthors(
+            @Parameter(description = "최소 게시글 수(이 값 이상 게시글을 작성한 작성자만")
+            @RequestParam(defaultValue = "1") long minCount
+    ){
+        return boardService.getAuthorStats(minCount);
+    }
     @Operation(summary = "게시글 수정",
             description = "경로의 id 게시글을 수정한다. 파일 교체가 가능하도록 multipart/form-data 로 받는다.")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

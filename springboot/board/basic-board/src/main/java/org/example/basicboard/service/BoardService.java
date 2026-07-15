@@ -90,4 +90,8 @@ public class BoardService {
         return boardRepository.findWithComments(id)
                 .orElseThrow(()-> new BoardNotFountException("게시글을 찾을 수 없습니다. id = "+id));
     }
+
+    public List<BoardAuthorStatsResponseDto> getAuthorStats(long minCount){
+        return boardRepository.countBoardsByAuthor(minCount);
+    }
 }

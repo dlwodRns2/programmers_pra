@@ -2,6 +2,7 @@ package org.example.basicboard;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 //* Restful API
 //자원을 URI로 표현하고, HTTP ㅔ서드로 그 자원에 대한 행위를 표현하는 API 설계 원칙
@@ -29,6 +30,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //ORM(Object Relational Mapping, 객체-관계 맵핑)
 //자바의 객체와 관계형 DB의 테이블을 서로 연결(매핑)해주는 기술.
 //자바 객체(Entity) <-> DB 테이블/행을 자동으로 매핑하고, 우리가 짠 코드 대신 SQL을 만들어 실행
+
+//* @EnableScheduling : 이 스위치가 없으면 "아무일도 일어나지 않는다"
+//- 에러도 경고도 없이 그냥 조용히 실행이 안된다.
+//- 이 어노테이션이 있어야 스프링이 시작할 때, @Scheduler가 붙은 메서드들을 찾아 스케줄러에 등록함
+@EnableScheduling
 @SpringBootApplication
 public class BasicBoardApplication {
     public static void main(String[] args) {

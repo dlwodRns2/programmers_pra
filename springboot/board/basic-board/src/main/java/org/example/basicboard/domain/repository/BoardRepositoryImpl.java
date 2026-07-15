@@ -12,9 +12,7 @@ import org.example.basicboard.domain.entity.Board;
 import org.example.basicboard.domain.entity.QBoard;
 import org.example.basicboard.domain.entity.QComment;
 import org.example.basicboard.domain.entity.QMember;
-import org.example.basicboard.dto.BoardListItemResponseDto;
-import org.example.basicboard.dto.BoardListResponseDto;
-import org.example.basicboard.dto.BoardSearchRequestDto;
+import org.example.basicboard.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -39,6 +37,16 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom {
     //- 클래스 이름과 인자를 "나중에(실행 떼)"끼워 맞추므로, 컴파일 시점에 검사가 불가능
     //-> 인자 순서/타입이 생성자와 어긋나면 컴파일은 통과하고 "실행 시"에 터진다(런타임 오류)
     //- 대신 DTO는 QueryDSL을 전혀 모른다(순수한 DTO 상태 유지)
+
+    //* @QueryProjection
+    // - Dto 생성자에 해당 애너테이션을 붙이면 Q클래스가 생성되고(빌드 1번 필요)
+    //쿼리에서 new QBoardAuthorStatsResponseDto(...) 처럼 "진짜 생성자 호출"로 쓴다
+    // => 인자 순서/타입이 틀리면 그 자리에서 "컴파일 에러"로 잡아낼 수 있음
+    // - 대신 Dto가 QueryDSL 어노테이션을 Import하게 됨
+
+    //* 결론
+    //"Dto 순수성"을 지키려면 Pprojection.constructor 방식을,
+    //"컴파일 안정성"이 우선이면 @QueryProjection 방식을 사용
     @Override
     public Page<BoardListItemResponseDto> searchBoards(BoardSearchRequestDto condition, Pageable pageable) {
         List<BoardListItemResponseDto> content = queryFactory.select(
@@ -111,6 +119,24 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom {
                 .fetchOne();
 
         return Optional.ofNullable(result);
+    }
+
+    @Override
+    public List<BoardAuthorStatsResponseDto> countBoardsByAuthor(long minCount) {
+
+       return queryFactory
+               .select(new QBoardAuthorStatsResponseDto(
+                       board.userId,
+                       member.userName,
+                       board.count()
+               ))
+               .from(board)
+               .leftJoin(member).on(board.userId.eq(member.userId)) //연관관계가 없는 테이블 join -> on으로
+               .groupBy(board.userId,member.userName)
+               .having(board.count().goe(minCount))
+               .orderBy(board.count().desc())
+               .fetch();
+
     }
 
     // 제목 부분 일치 (Like %title%). 빈 값이면 조건 없음(null)

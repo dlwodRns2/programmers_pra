@@ -1,5 +1,6 @@
 package org.example.basicboard.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class FileService {
     @Value("${file.upload-dir}")
@@ -37,6 +39,7 @@ public class FileService {
             File dest = new File(dir,storedFilename);
             file.transferTo(dest);
 
+            log.info("파일 저장 : originalFileName = {}, storedFileName = {}",file.getOriginalFilename(),storedFilename);
             return dest.getPath();
 
         }catch (Exception e){
@@ -71,6 +74,9 @@ public class FileService {
         if(!file.exists()){
             return;
         }
-        file.delete();
+        boolean deleted = file.delete();
+        if(!deleted){
+            log.warn("첨부파일 삭제 실패(디스크에 남음) : filePath = {}",filePath);
+        }
     }
 }
