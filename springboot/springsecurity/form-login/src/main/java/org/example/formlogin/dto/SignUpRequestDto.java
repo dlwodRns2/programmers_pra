@@ -14,7 +14,7 @@ public class SignUpRequestDto {
     public User toUser(String encodedPassword){
         return User.builder()
                 .userId(userId)
-                .password(password)
+                .password(encodedPassword)
                 .name(userName)
                 .build();
     }

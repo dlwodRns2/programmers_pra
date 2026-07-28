@@ -8,3 +8,5 @@ CREATE TABLE user (
                       role ENUM('ROLE_USER', 'ROLE_ADMIN') DEFAULT 'ROLE_USER',
                       PRIMARY KEY (id)
 );
+
+select * from user;
