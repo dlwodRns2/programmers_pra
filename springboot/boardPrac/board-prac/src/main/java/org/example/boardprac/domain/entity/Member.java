@@ -17,9 +17,14 @@ public class Member {
     @Column(nullable = false, length=50)
     private String userId;
 
-    @Column(nullable = false, length=50)
+    @Column(nullable = false, length=100)
     private String password;
 
     @Column(nullable = false, length=30)
     private String userName;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Role role = Role.ROLE_MEMBER;
+
 }

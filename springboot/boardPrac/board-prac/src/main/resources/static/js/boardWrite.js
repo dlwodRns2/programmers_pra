@@ -2,6 +2,7 @@ let selectedFile = null; // 파일은 1개만 선택 가능
 
 $(document).ready(() => {
     checkSession();
+    $('#userId').val(localStorage.getItem('userId'));
     saved();
     fileChaged();
 });
@@ -15,6 +16,9 @@ let saved = () => {
         $.ajax({
             type: 'POST',
             url: '/api/boards', // 서버의 엔드포인트 URL
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+            },
             data: formData,
             processData: false,
             contentType: false,
@@ -65,8 +69,6 @@ let updateFileList = () => {
 }
 
 let checkSession = () => {
-    let hUserId = $('#hiddenUserId').val();
-
-    if (hUserId == null || hUserId === '')
+    if (!localStorage.getItem('accessToken'))
         window.location.href = "/members/login";
 }

@@ -18,6 +18,9 @@ let updated = () => {
         $.ajax({
             type: 'PUT',
             url: '/api/boards/' + hId, // 수정 대상 글을 경로로 식별한다 (PUT /api/boards/{id})
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+            },
             data: formData,
             processData: false,
             contentType: false,
@@ -70,9 +73,7 @@ let updateFileList = () => {
 }
 
 let checkSession = () => {
-    let hUserId = $('#hiddenUserId').val();
-
-    if (hUserId == null || hUserId === '')
+    if (!localStorage.getItem('accessToken'))
         window.location.href = "/members/login";
 }
 
@@ -82,6 +83,9 @@ let loadBoardDetail = () => {
     $.ajax({
         type: 'GET',
         url: '/api/boards/' + hId,
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+        },
         success: (response) => {
             $('#title').val(response.title);
             $('#content').val(response.content); // textarea 값은 .val() 로 채운다

@@ -21,8 +21,11 @@ $(document).ready(() => {
             success: (response) => {
                 console.log('res :: ', response)
                 alert(response.message);
-                if (response.successed) {
+                if (response.loggedIn) {
                     // 성공 후 다른 페이지로 이동하거나 처리할 코드 작성 가능
+                    localStorage.setItem('accessToken',response.accessToken);
+                    localStorage.setItem('refreshToken',response.refreshToken);
+                    localStorage.setItem('userId',response.userId);
                     window.location.href = response.url;
                 }
             },

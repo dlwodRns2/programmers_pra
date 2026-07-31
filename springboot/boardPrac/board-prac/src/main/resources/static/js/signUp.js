@@ -6,11 +6,13 @@ $(document).ready(() => {
         let userId = $('#user_id').val();
         let password = $('#password').val();
         let userName = $('#user_name').val();
+        let role = $('#role').val();
 
         let formData = {
             userId : userId,
             password : password,
-            userName : userName
+            userName : userName,
+            role : role
         }
 
 
@@ -29,11 +31,7 @@ $(document).ready(() => {
             error: function(error) {
                 // 실패 시 실행될 콜백 함수
                 console.error('오류 발생:', error);
-                // 서버가 내려준 ErrorResponseDto 의 message 를 우선 사용하고, 없으면 기본 메시지를 띄운다
-                let message = error.responseJSON && error.responseJSON.message
-                    ? error.responseJSON.message
-                    : '회원가입 중 오류가 발생했습니다.';
-                alert(message);
+                alert('회원가입 중 오류가 발생했습니다.');
             }
         });
 

@@ -12,15 +12,11 @@ public class MemberController {
     public String join(){
         return "sign-up";
     }
-
     @GetMapping("/login")
     public String login(){
         return "sign-in";
     }
 
-    @GetMapping("/logout")
-    public String logout(HttpSession session){
-        session.invalidate();
-        return "redirect:/members/login";
-    }
+
+
 }

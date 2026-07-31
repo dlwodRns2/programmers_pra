@@ -2,16 +2,37 @@
 $(document).ready(() => {
     checkSession();
     loadBoard(1); // 처음엔 1페이지를 보여준다
+    logout();
 });
 
 const PAGE_SIZE = 10; // 한 페이지에 보여줄 게시글 수
 
-// 로그인(세션) 확인 - 로그인 정보가 없으면 로그인 페이지로 보낸다
+// 로그인(토큰) 확인 - 토큰이 없으면 로그인 페이지로 보낸다
 let checkSession = () => {
-    let hUserId = $('#hiddenUserId').val();
-
-    if (hUserId == null || hUserId === '')
+    if (!localStorage.getItem('accessToken'))
         window.location.href = "/members/login";
+}
+
+let logout = () => {
+    $('#logoutBtn').on('click', () => {
+        $.ajax({
+            type: 'POST',
+            url: '/api/members/logout',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+            },
+            success: () => {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('userId');
+                window.location.href = '/members/login';
+            },
+            error: (error) => {
+                console.error('오류 발생:', error);
+                alert('로그아웃 중 오류가 발생했습니다.');
+            }
+        });
+    });
 }
 
 // 특정 페이지의 게시글 + 하단 페이지 번호를 로드하는 함수
@@ -19,6 +40,9 @@ let loadBoard = (page) => {
     $.ajax({
         type: 'GET',
         url: '/api/boards',
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+        },
         data: {
             page: page,
             size: PAGE_SIZE

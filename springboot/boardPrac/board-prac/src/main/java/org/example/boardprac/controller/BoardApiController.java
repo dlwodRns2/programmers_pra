@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.example.boardprac.config.security.CustomUserDetails;
 import org.example.boardprac.domain.entity.Board;
 import org.example.boardprac.dto.*;
 import org.example.boardprac.service.BoardService;
@@ -16,6 +17,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
@@ -108,13 +111,17 @@ public class BoardApiController {
             description = "제목/내용/작성자와 (선택적) 첨부파일을 multipart/form-data 로 받아 새 게시글을 저장한다."
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void saveArticle(@ModelAttribute BoardWriteRequestDto dto){
-        boardService.saveArticle(dto);
+    public void saveArticle(
+            @ModelAttribute BoardWriteRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ){
+        boardService.saveArticle(dto, userDetails.getUsername());
     }
 
     @Operation(summary = "게시글 삭제",
             description = "경로의 id 게시글을 삭제한다. 첨부파일 경로(filePath)를 JSON 본문으로 함께 받아 파일도 정리한다.")
     @DeleteMapping("/{id}")
+    @PreAuthorize("@boardAuthService.canDelete(#id,authentication)")
     public void deleteArticle(
             @Parameter(description = "삭제할 게시글 id", example = "1")
             @PathVariable Long id,

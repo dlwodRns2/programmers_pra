@@ -17,6 +17,9 @@ let deleteArticle = () => {
     $.ajax({
         type: 'DELETE',
         url: '/api/boards/' + resourceId, // 실제 서버 API URL 및 삭제할 리소스 ID
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+        },
         data: JSON.stringify({ filePath: filePath }), // filePath를 JSON으로 서버에 전송
         contentType: 'application/json', // JSON 형식으로 전송
         success: (response) => {
@@ -31,19 +34,20 @@ let deleteArticle = () => {
 }
 
 let checkSession = () => {
-    let hUserId = $('#hiddenUserId').val();
-
-    if (hUserId == null || hUserId === '')
+    if (!localStorage.getItem('accessToken'))
         window.location.href = "/members/login";
 }
 
 let loadBoardDetail = () => {
 
     let hId = $('#hiddenId').val();
-    let hUserId = $('#hiddenUserId').val();
+    let hUserId = localStorage.getItem('userId');
     $.ajax({
         type: 'GET',
         url: '/api/boards/' + hId,
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+        },
         success: (response) => {
             $('#title').text(response.title);
             $('#content').text(response.content);

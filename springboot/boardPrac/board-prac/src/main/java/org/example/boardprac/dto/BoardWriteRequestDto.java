@@ -15,8 +15,6 @@ public class BoardWriteRequestDto {
     private String title;
     @Schema(description = "게시글 내용",example = "안녕하세요. 반갑습니다.")
     private String content;
-    @Schema(description = "작성자 아이디(로그인 사용자)", example = "user01")
-    private String userId;
     @Schema(description = "첨부파일(선택). 안고르면 비어있음",type="string",format = "binary")
     private MultipartFile file;
 }

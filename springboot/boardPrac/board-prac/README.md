@@ -1,37 +1,22 @@
-package org.example.boardprac.service;
+1. basic-board의 세션 기반 로그인을 jwt 토큰 방식으로 변경
+=> 서버는 stateless
 
-import lombok.RequiredArgsConstructor;
-import org.example.boardprac.domain.entity.Board;
-import org.example.boardprac.domain.repository.BoardRepository;
-import org.example.boardprac.domain.repository.MemberRepository;
-import org.example.boardprac.dto.BoardDeleteRequestDto;
-import org.example.boardprac.dto.BoardUpdateRequestDto;
-import org.example.boardprac.dto.BoardWriteRequestDto;
-import org.example.boardprac.exception.BoardNotFountException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
+2. 인가 적용 : 관리자는 모든 게시글을 삭제 가능. BoardAuthService에 boolean canDelete 메서드로 구현 
+2-1. 헤더의 Autorization에 토큰을 실어서 Delete /api/boards/boardId 요청
+2-2. TokenAuthenticationFilter 통과 : 토큰이 유효한지 확인 후 SecurityContext에 Member 등록.
+2-3. authorizeHttpRequests 통과 : 4-2에서 SecurityContext를 채웠으면 통과
+2-4. BoardApiController.deleteArtice에 @PreAuthorize("@boardAuthService.canDelete(#id,authentication)") 어노테이션을 추가
+2-5. deleteArticle 처리 전에 canDelete 부터 실행. 
+2-6. canDelete의 결과가 true : boardService.deleteArticle 실행 -> 게시글 삭제 / false : AccessDeniedException 발생. 403에러
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+//BoardAuthService
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BoardService {
-    private final BoardRepository boardRepository;
-    private final FileService fileService;
+private final BoardRepository boardRepository;
+private final FileService fileService;
 
     // 최신 글이 위로 오도록 id 내림차순. 화면 page(1~)를 Pageable(0~)로 바꾸려 page - 1
     public List<Board> getBoardList(int page,int size){

@@ -1,6 +1,5 @@
 package org.example.boardprac.controller;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,45 +13,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/")
 public class BoardController {
     @GetMapping
-    public String boardList(HttpSession session, Model model){
-        if (session.getAttribute("userId") == null) {
-            return "redirect:/members/login";
-        }
-        setSession(session,model);
+    public String boardList(){
         return "board-list";
     }
 
     @GetMapping("/write")
-    public String write(HttpSession session, Model model){
-        setSession(session,model);
+    public String write(){
         return "board-write";
     }
     @GetMapping("/detail")
     public String detail(
             @RequestParam Long id,
-            HttpSession session,
             Model model
     ){
-        setSession(session,model);
         model.addAttribute("id",id);
         return "board-detail";
     }
     @GetMapping("/update/{id}")
     public String update(
             @PathVariable Long id,
-            HttpSession session,
             Model model
     ){
-        setSession(session,model);
         model.addAttribute("id",id);
         return "board-update";
-    }
-
-    private void setSession(HttpSession session, Model model){
-        String userId = session.getAttribute("userId").toString();
-        String userName = session.getAttribute("userName").toString();
-
-        model.addAttribute("userId",userId);
-        model.addAttribute("userName",userName);
     }
 }

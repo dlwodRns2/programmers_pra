@@ -33,8 +33,24 @@ label {
     margin-bottom: 5px;
 }
 
+.page-link {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.page-link a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+.page-link a:hover {
+    text-decoration: underline;
+}
+
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+select {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;

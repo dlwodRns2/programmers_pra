@@ -4,6 +4,7 @@ import org.example.boardprac.dto.ErrorResponseDto;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -14,6 +15,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(new ErrorResponseDto(HttpStatus.CONFLICT.value(), e.getMessage()));
+    }
+
+    // @PreAuthorize 등 메서드 보안 실패 시 던져지는 예외 - 시큐리티의 accessDeniedHandler보다 먼저 여기서 잡히므로 직접 403으로 응답
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDto> handleAccessDenied(AccessDeniedException e){
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponseDto(HttpStatus.FORBIDDEN.value(), "접근 권한이 없습니다"));
     }
 
     @ExceptionHandler(BoardNotFountException.class)
