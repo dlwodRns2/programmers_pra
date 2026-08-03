@@ -1,0 +1,169 @@
+package org.example.oauth2.config;
+
+//* OAuth2(Open Authorization 2.0)
+//oAuth2는 "비밀번호를 넘겨주지 않고 권한을 위임"하기 위한 표준 프레임워크
+//OAuth2 사용 방법
+//사용자가 "카카오에게 직접" 허락 받고
+//우리 서비스는 그 허락의 증표(access token)만 받는다.
+//=> 비밀번호를 원래 주인(카카오)만 알고, 위임 범위와 회수가 가능해진다
+
+//역할
+//1) Resource Owner : 자원의 주인 = 사용자(카카오 계정의 주인)
+//2) Client : 자원을 쓰고 싶은 제3자 앱(=우리 서비스)
+//3) Authorization Server : 허락(인가)를 발급하는 서버 = kauth.kakao.com
+//4) Resource Server : 실제 자원(프로필 등)을  보관한 서버 = kapi.kakao.com
+
+//인가 코드 방식 - 표준 흐름
+//1) Client가 사용자를 Authorization Server의 인가 페이지로 리다이렉트
+//(client_id, redirect_uri, scope, state를 쿼리로 실어 보냄)
+//2) 사용자가 "카카오 화면에서" 로그인하고 권한 제공에 동의
+//3) Authorization Server가 redirect_uri로 "인가 코드"를 돌려준다 (브라우저 공유)
+//4) Client 서버가 code + client_secret으로 토큰 엔드포인트에 직접 요청(브라우저를 안 거침)
+//5) Authorization Server가 access token 발급
+//6) Client가 그 토큰으로 Resource Server에서 사용자 정보 조회
+
+//Spring Security에서의 동작 흐름 - oAuth2Login()
+//위 표준 흐름을 필터 2개가 나눠서 대신 처리
+//1)OAuth2AuthrorizationRequestRedirectFilter
+//2)OAuth2LoginAuthenticationFilter
+//3)조회된 사용자 정보를 OAuth2UserService.loadUser에 넘긴다.
+//4)반환된 OAuth2User로 Authentication을 만들어 SecurityContext에 저장 -> 로그인 완료
+//5)마지막으로 SuceessHandler 호출 => 로그인 후처리(JWT 발급)도 개발자의 몫
+
+//* kakao developers 절차
+
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.example.oauth2.config.filter.TokenAuthenticationFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.IOException;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
+public class SecurityConfig {
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+        http
+                // [CSRF vs XSS — 토큰 방식에서 위협이 어떻게 바뀌는가]
+                //
+                // CSRF(Cross-Site Request Forgery):
+                //   "브라우저가 쿠키(세션)를 자동으로 실어 보내는" 성질을 악용해,
+                //   로그인된 사용자의 브라우저로 의도하지 않은 요청을 보내게 하는 공격.
+                //   → 우리는 인증을 Authorization 헤더(자동 전송 안 됨)로 하므로 성립하지 않아 끈다
+                //
+                // XSS(Cross-Site Scripting):
+                //   공격자가 페이지에 악성 스크립트를 주입해 "사용자의 브라우저에서" 실행시키는 공격.
+                //   (예: 게시글에 <script> 태그를 심었는데 이스케이프 없이 그대로 렌더링되는 경우)
+                //   토큰 방식에서는 이게 더 큰 위협이 된다:
+                //   - localStorage는 같은 페이지의 JS라면 누구나 읽을 수 있다
+                //     → 주입된 스크립트가 localStorage.getItem('accessToken')으로 토큰을 훔칠 수 있다
+                //   - 그래서 이 프로젝트의 방어 설계:
+                //     ① access token은 수명을 짧게(2h) → 탈취돼도 피해 시간 제한
+                //     ② refresh token(7d)은 HttpOnly 쿠키에 → JS 접근 자체가 불가능해 XSS로 못 훔친다
+                //   - 근본 방어는 설정이 아니라 코딩 습관: 사용자 입력을 이스케이프 없이 렌더링하지 않기
+                //     (Thymeleaf의 th:text는 자동 이스케이프, th:utext는 위험) + CSP 헤더 적용 등
+                .csrf(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(
+                                "/api/users/login",
+                                "/users/login",
+                                "/", // 페이지(HTML)는 공개, 데이터는 보호 - 브라우저 페이지 이동은 Bearer 헤더를 못 실으므로 페이지 인가는 API가 담당
+                                "/admin",
+
+                                "/users/join",
+                                "/api/users/join",
+                                "/api/users/login",
+                                "/api/tokens/refresh",
+
+                                "/css/**",
+                                "/js/**",
+                                "/access-denied",
+                                "/error" // 404 등 에러 포워딩 경로. 막으면 인증 리다이렉트 루프가 생긴다.
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                // JWT필터를 UsernamePasswordAuthenticationFilter(폼로그인 필터) 자리 앞에 끼워 넣겠다.
+                // 인가 판단은 체인 맨 끝에서 일아나므로,
+                // 그 전에 토큰을 검증해 SecurityContext를 채워둬야 "인증된 요청"으로 취급된다.
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(accessDeniedHandler())
+                        .authenticationEntryPoint(authenticationEntryPoint()));
+
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
+    // 아이디/비밀번호 검증의 진입점
+    // form-login에서는 필터가 내부적으로 호출했지만,
+    // 토큰 방식에서는 UserSerivce.login()이 직접 호출한다.
+    // authentication() -> DaoAuthenticationProvider -> UserDetailService.loadUserByUsername() -> 비밀번호 대조
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration){
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public RoleHierarchy roleHierarchy(){
+        return RoleHierarchyImpl.withDefaultRolePrefix()
+                .role("ADMIN").implies("USER")
+                .build();
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler(){
+        return ((request,response,accessDeniedException)->{
+            if(request.getRequestURI().contains("/api")){
+                sendError(response, HttpServletResponse.SC_FORBIDDEN,"접근 권한이 없습니다.");
+            }else{
+                response.sendRedirect("/acceess-denied");
+            }
+        });
+    }
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint(){
+        return ((request,response,authException)->{
+            if(request.getRequestURI().startsWith("/api")){
+                sendError(response, HttpServletResponse.SC_UNAUTHORIZED,"인증이 필요합니다");
+            }else{
+                response.sendRedirect("/access-denied");
+            }
+        });
+    }
+
+    private void sendError(HttpServletResponse response, int status, String message) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("status code : "+status+", message : "+message);
+    }
+
+}
