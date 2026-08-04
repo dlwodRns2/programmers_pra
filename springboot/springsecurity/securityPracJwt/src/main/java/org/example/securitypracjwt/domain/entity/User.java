@@ -1,7 +1,8 @@
-package org.example.token.domain.entity;
+package org.example.securitypracjwt.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.securitypracjwt.config.oauth2.AuthProvider;
 
 @Entity
 @Table(name = "user")
@@ -30,4 +31,16 @@ public class User {
     @Builder.Default
     private Role role = Role.ROLE_USER;
 
+    @Column(length=20)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private AuthProvider provider = AuthProvider.LOCAL;
+
+    @Column(length=100)
+    private String providerId;
+
+    public User updateProfile(String name){
+        this.name=name;
+        return this;
+    }
 }

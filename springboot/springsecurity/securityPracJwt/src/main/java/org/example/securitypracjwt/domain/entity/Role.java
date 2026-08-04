@@ -1,4 +1,4 @@
-package org.example.token.domain.entity;
+package org.example.securitypracjwt.domain.entity;
 
 public enum Role {
     ROLE_USER,
