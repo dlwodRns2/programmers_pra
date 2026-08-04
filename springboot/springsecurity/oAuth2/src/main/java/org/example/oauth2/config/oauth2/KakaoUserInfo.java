@@ -50,6 +50,7 @@ public record KakaoUserInfo(
         return (Map<String,Object>)attributes.get("kakao_account");
     }
     private Map<String,Object> profile(){
-        return (Map<String,Object>)attributes.get("profile");
+        Map<String, Object> kakaoAccount = kakaoAccount();
+        return kakaoAccount==null?null:(Map<String,Object>)kakaoAccount.get("profile");
     }
 }

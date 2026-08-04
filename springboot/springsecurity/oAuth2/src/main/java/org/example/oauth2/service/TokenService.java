@@ -7,6 +7,7 @@ import org.example.oauth2.config.jwt.TokenProvider;
 import org.example.oauth2.config.jwt.TokenStatus;
 import org.example.oauth2.domain.entity.User;
 import org.example.oauth2.dto.RefreshTokenResponseDto;
+import org.example.oauth2.dto.SignupPayloadDto;
 import org.example.oauth2.util.CookieUtil;
 import org.springframework.stereotype.Service;
 
@@ -53,5 +54,12 @@ public class TokenService {
             }
         }
         return null;
+    }
+
+    //tokenProvider의 작업을 tokenServiced에서 감싼다
+    //=> 다른 클래스는 tokenService를 통해서 메서드를 사용
+    public SignupPayloadDto getSignupPayload(String token){
+        return tokenProvider.getSignupPayload(token);
+
     }
 }

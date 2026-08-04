@@ -64,6 +64,10 @@ public class CustomOAuth2User implements OAuth2User {
     //원시 맵에서 "사용자 식별자"를 가리키는 것. 제공자마다 다름
     private final String nameAttributeKey;
 
+    public static CustomOAuth2User unregistered(AuthProvider provider, OAuth2UserInfo userInfo, Map<String, Object> attributes, String nameAttributeKey) {
+        return new CustomOAuth2User(null,provider,userInfo,attributes,nameAttributeKey);
+    }
+
     //우리 DB에 이미 가입된 회원인지 확인. SuccessHandler가 "로그인 완료 vs 가입 안내"
     public boolean isRegistered(){
         return user!=null;

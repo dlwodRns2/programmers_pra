@@ -1,5 +1,6 @@
 package org.example.oauth2.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.oauth2.config.jwt.JwtProperties;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserApiController {
+
     private final UserService userService;
     private final JwtProperties jwtProperties;
+
     @PostMapping("/join")
     public SignUpResponseDto join(@RequestBody SignUpRequestDto requestDto){
         userService.signUp(requestDto);
@@ -25,6 +28,24 @@ public class UserApiController {
         return SignUpResponseDto.builder()
                 .url("/users/login")
                 .build();
+    }
+
+    //동의하고 가입까지 하는 순간 로그인까지 처리
+    //signUpRequest를 받고 SignInResponse를 반환
+    @PostMapping("/oauth-join")
+    public SignInResponseDto oauthJoin(
+            @RequestBody OAuthSignUpRequestDto requestDto,
+            HttpServletResponse response
+    ){
+        SignInResponseDto signInResponseDto = userService.oauthSignUp(requestDto);
+        CookieUtil.addCookie(
+                response,
+                CookieUtil.REFRESH_TOKEN_COOKIE,
+                signInResponseDto.getRefreshToken(),
+                (int) jwtProperties.getRefreshTokenValidity().toSeconds()
+        );
+        signInResponseDto.setRefreshToken(null);
+        return signInResponseDto;
     }
     @PostMapping("/login")
     public SignInResponseDto login(
@@ -40,6 +61,19 @@ public class UserApiController {
         );
         signInResponseDto.setRefreshToken(null);
         return signInResponseDto;
+    }
+    @PostMapping("/logout")
+    public LogoutResponseDto logout(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ){
+        //액세스 토큰은 localStorage에 저장됨 => JS만 읽고 쓸 수 있는 저장소
+        //=> lo
+        CookieUtil.deleteCookie(request,response,CookieUtil.REFRESH_TOKEN_COOKIE);
+        return LogoutResponseDto.builder()
+                .message("로그아웃 되었습니다.")
+                .url("/users/login")
+                .build();
     }
     @GetMapping("/info")
     public UserInfoResponseDto getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {

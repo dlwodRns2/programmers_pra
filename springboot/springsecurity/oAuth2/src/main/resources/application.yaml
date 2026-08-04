@@ -42,7 +42,7 @@ spring:
         #카카오는 모르는 제공자라서 표준 흐름의 각 단계가 "어디"인지 직접 알려줘야한다.
         provider: #구글과 달리 카카오는 provider 정보를 설정 파일에 작성해야함
           kakao:
-            authorization-uri: https://kauth2.kakao.com/oauth2/authorize #인가 페이지
+            authorization-uri: https://kauth.kakao.com/oauth/authorize #인가 페이지
             token-uri: https://kauth.kakao.com/oauth/token #코드 -> 토큰 교환(access token으로 바꾸는 곳). 브라우저를 거치지 않고 "우리 서버 -> 카카오 서버"가 직접 통신
             user-info-uri: https://kapi.kakao.com/v2/user/me #사용자 정보 조회 : 이 응답이 kakaoUserInfo가 파싱하는 바로 그 맵(attributes)이 된다.
             #nameAttributeKey로 들어가 providerId 추출의 기준이 된다. -> user_info 응답에서 "이 사용자를 유일하게 식별하는 값"이 담긴 최상위 필드 이름

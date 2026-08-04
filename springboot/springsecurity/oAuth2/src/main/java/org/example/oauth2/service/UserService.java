@@ -2,11 +2,10 @@ package org.example.oauth2.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.oauth2.config.security.CustomUserDetails;
+import org.example.oauth2.domain.entity.Role;
 import org.example.oauth2.domain.entity.User;
 import org.example.oauth2.domain.repository.UserRepository;
-import org.example.oauth2.dto.SignInRequestDto;
-import org.example.oauth2.dto.SignInResponseDto;
-import org.example.oauth2.dto.SignUpRequestDto;
+import org.example.oauth2.dto.*;
 import org.example.oauth2.exception.DuplicateUserIdException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+import static org.example.oauth2.domain.entity.Role.ROLE_USER;
 
 @Service
 @RequiredArgsConstructor
@@ -53,5 +56,29 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
+    public SignInResponseDto oauthSignUp(OAuthSignUpRequestDto requestDto) {
+        SignupPayloadDto payload = tokenService.getSignupPayload(requestDto.getSignupToken());
+        Role role= requestDto.getRole();
 
+        //이미 가입되어있으면 그대로 로그인 처리(멱등)
+        //뒤로가기 / 새로고침으로 같은 토큰이 두 번 제출되어도 중복 가입이 생기지 않는다.
+        User user = userRepository.findByProviderAndProviderId(payload.getProvider(), payload.getProviderId())
+                .orElseGet(()->userRepository.save(
+                        User.builder()
+                                .userId(payload.getProvider().name().toLowerCase()+"_"+payload.getProviderId())
+                                .name(payload.getName())
+                                .email(payload.getEmail())
+                                .provider(payload.getProvider())
+                                .providerId(payload.getProviderId())
+                                .role(role!=null ? role : ROLE_USER)
+                                .build()
+                ));
+        TokenService.TokenPair tokenPair = tokenService.issueToken(user);
+        return SignInResponseDto.builder()
+                .isLoggedIn(true)
+                .message("가입이 완료되었습니다.")
+                .url("/")
+                .build();
+    }
 }
