@@ -1,10 +1,12 @@
 package org.example.authservice.dto;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.example.authservice.domain.entity.Role;
 import org.example.authservice.domain.entity.User;
 
 @Getter
+@ToString
 public class SignUpRequestDto {
     private String userId;
     private String password;

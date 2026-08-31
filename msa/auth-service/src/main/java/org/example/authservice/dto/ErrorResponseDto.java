@@ -1,12 +1,13 @@
 package org.example.authservice.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 @AllArgsConstructor
-public class SignUpResponseDto {
-    private String url;
+public class ErrorResponseDto {
+
+    private int status;
+    private String message;
+
 }
