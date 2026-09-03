@@ -1,13 +1,84 @@
 package org.example.boardservice.domain.repository;
 
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.example.boardservice.domain.entity.Board;
+import org.example.boardservice.domain.entity.QBoard;
+import org.example.boardservice.domain.entity.QComment;
 import org.example.boardservice.dto.BoardListItemResponseDto;
 import org.example.boardservice.dto.BoardSearchRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Optional;
+
+@Repository
+@RequiredArgsConstructor
 public class BoardRepositoryImpl implements BoardRepositoryCustom {
+    private final JPAQueryFactory queryFactory;
+
+    private static final QBoard board = QBoard.board;
+    private static final QComment comment = QComment.comment;
+
     @Override
     public Page<BoardListItemResponseDto> searchBoards(BoardSearchRequestDto condition, Pageable pageable) {
+
+       queryFactory.select(
+
+       ).from(board).where(
+
+       )
+               .orderBy(board.id.desc())
+               .offset(pageable.getOffset())
+               .limit(pageable.getPageSize());
         return null;
     }
+
+    @Override
+    public Optional<Board> findWithComments(Long id) {
+        Board result = queryFactory
+                .selectFrom(board)
+                .leftJoin(board.comments, comment).fetchJoin()
+                .where(board.id.eq(id))
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+    //제목 부분 일치(Like %title%). 빈 값이면 조회 없음(null)
+    private BooleanExpression titleContains(String title){
+        return (title == null || title.isBlank()) ? null : board.title.contains(title);
+    }
+
+    //작성자 아이디 정확히 일치. 빈 값이면 조건 없음(null)
+    private BooleanExpression userIdEquals(String userId){
+        return (userId == null || userId.isBlank()) ? null : board.userId.eq(userId);
+    }
+
+    // * goe / loe 는 비교 연산자의 약어다
+    // - gt(Greater Than, >)
+    // - goe(Greater Than or Equal, >=)
+    // - lt(Less Than, <)
+    // - loe(Less Than or Equal, <=)
+    // -> 아래 goe + loe 한 쌍이 "from 이상 AND to 이하" => Between 기간 검색이 된다.
+    private BooleanExpression createdGoe(LocalDate from){
+        return from == null ? null : board.created.goe(from.atStartOfDay());
+    }
+
+    private BooleanExpression createdLoe(LocalDate to){
+        return to == null ? null : board.created.loe(to.atTime(LocalTime.MAX));
+    }
+
+    private Expression<Long> commentCountOf(QBoard board){
+        return JPAExpressions
+                .select(comment.count())
+                .from(comment)
+                .where(comment.board.id.eq(board.id));
+    }
+
 }

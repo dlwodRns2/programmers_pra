@@ -1,10 +1,13 @@
 package org.example.boardservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.boardservice.dto.BoardListItemResponseDto;
-import org.example.boardservice.dto.BoardSearchRequestDto;
+import org.example.boardservice.domain.entity.Board;
+import org.example.boardservice.dto.*;
+import org.example.boardservice.mapper.BoardMapper;
 import org.example.boardservice.service.BoardService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/boards")
 public class BoardApiController {
     private final BoardService boardService;
+    private final BoardMapper boardMapper;
 
     @GetMapping("/search")
     public Page<BoardListItemResponseDto> searchBoards(
@@ -19,7 +23,40 @@ public class BoardApiController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
             ){
-        System.out.println("dto "+dto);
-        return null;
+        return boardService.searchBoards(dto, PageRequest.of(page-1,size));
+    }
+
+    @GetMapping("/{id}/with-comments")
+    public BoardWithCommentsResponseDto getBoardWithComments(
+            @PathVariable("id") long id
+    ){
+        Board board = boardService.getBoardWithComments(id);
+        return boardMapper.toBoardWithCommentsResponseDto(board);
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void saveBoard(@ModelAttribute BoardWriteRequestDto dto){
+        boardService.saveBoard(dto.getUserId(),dto.getTitle(),dto.getContent(),dto.getFile());
+    }
+
+    @GetMapping("/{id}")
+    public BoardDetailResponseDto getBoardDetail(@PathVariable long id){
+        Board boardDetail = boardService.getBoardDetail(id);
+
+        return BoardDetailResponseDto.builder()
+                .title(boardDetail.getTitle())
+                .content(boardDetail.getContent())
+                .filePath(boardDetail.getFilePath())
+                .created(boardDetail.getCreated())
+                .userId(boardDetail.getUserId())
+                .build();
+    }
+
+    @PutMapping(value="/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void updateBoard(
+            @PathVariable long id,
+            @ModelAttribute BoardUpdateRequestDto dto
+    ){
+        boardService.updateBoard(id,dto);
     }
 }
