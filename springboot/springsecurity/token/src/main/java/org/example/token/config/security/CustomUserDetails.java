@@ -1,6 +1,6 @@
 package org.example.token.config.security;
 
-import org.example.token.domain.User;
+import org.example.token.domain.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import org.jspecify.annotations.Nullable;

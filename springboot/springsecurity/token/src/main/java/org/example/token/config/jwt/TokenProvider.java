@@ -1,8 +1,8 @@
 package org.example.token.config.jwt;
 
 import org.example.token.config.security.CustomUserDetails;
-import org.example.token.domain.Role;
-import org.example.token.domain.User;
+import org.example.token.domain.entity.Role;
+import org.example.token.domain.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtParser;

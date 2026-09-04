@@ -3,9 +3,9 @@ package org.example.webservice.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.webservice.client.BoardClient;
-import org.example.webservice.dto.BoardPageResponseDto;
-import org.example.webservice.dto.BoardSearchRequestDto;
+import org.example.webservice.dto.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -15,5 +15,40 @@ public class BoardService {
 
     public BoardPageResponseDto searchBoard(String authorization, BoardSearchRequestDto condition, int page, int size){
         return boardClient.searchBoards(authorization, condition, page, size);
+    }
+
+    public BoardWithCommentsResponseDto getBoardWithComments(String authorization, long id){
+        return boardClient.getBoardWithComments(authorization, id);
+    }
+    public void saveBoard(String authorization, BoardWriteRequestDto dto){
+        boardClient.saveBoard(
+                authorization,
+                dto.getTitle(),
+                dto.getContent(),
+                dto.getUserId(),
+                emptyToNull(dto.getFile())
+        );
+    }
+    private MultipartFile emptyToNull(MultipartFile file){
+        return (file == null || file.isEmpty()) ? null : file;
+    }
+
+    public BoardDetailResponseDto getBoardDetail(String authorization, long id){
+        return boardClient.getBoardDetail(authorization, id);
+    }
+
+    public void updateBoard(String authorization, long id, BoardUpdateRequestDto dto){
+        boardClient.updateBoard(
+                authorization,
+                id,
+                dto.getTitle(),
+                dto.getContent(),
+                emptyToNull(dto.getFile()),
+                String.valueOf(dto.isFileFlag())
+        );
+    }
+
+    public void deleteBoard(String authorization, long id, BoardDeleteRequestDto dto){
+        boardClient.deleteBoard(authorization, id, dto);
     }
 }

@@ -1,7 +1,7 @@
 package org.example.token.dto;
 
-import org.example.token.domain.Role;
-import org.example.token.domain.User;
+import org.example.token.domain.entity.Role;
+import org.example.token.domain.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

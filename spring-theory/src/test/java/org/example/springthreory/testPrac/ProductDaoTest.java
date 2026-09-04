@@ -1,6 +1,6 @@
 package org.example.springthreory.testPrac;
 
-import org.example.springthreory.AppConfig;
+import org.example.springthreory.aopPrac.AppConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

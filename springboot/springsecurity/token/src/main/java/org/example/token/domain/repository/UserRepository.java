@@ -1,6 +1,6 @@
 package org.example.token.domain.repository;
 
-import org.example.token.domain.User;
+import org.example.token.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

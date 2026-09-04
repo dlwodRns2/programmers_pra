@@ -25,7 +25,6 @@ public abstract class Member implements Serializable, Comparable<Member> {
     public String getName() {
         return name;
     }
-
     public abstract String getGrade();
     public abstract String getBenefit();
     public abstract int getMonthlyFee();

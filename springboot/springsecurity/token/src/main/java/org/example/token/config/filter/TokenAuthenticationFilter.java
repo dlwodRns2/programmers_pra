@@ -2,7 +2,7 @@ package org.example.token.config.filter;
 
 import org.example.token.config.jwt.TokenProvider;
 import org.example.token.config.jwt.TokenStatus;
-import org.example.token.domain.User;
+import org.example.token.domain.entity.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

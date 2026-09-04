@@ -6,10 +6,7 @@ import org.example.boardservice.client.AuthClient;
 import org.example.boardservice.domain.entity.Board;
 import org.example.boardservice.domain.repository.BoardRepository;
 import org.example.boardservice.domain.repository.BoardRepositoryCustom;
-import org.example.boardservice.dto.BoardListItemResponseDto;
-import org.example.boardservice.dto.BoardSearchRequestDto;
-import org.example.boardservice.dto.BoardUpdateRequestDto;
-import org.example.boardservice.dto.UserNameResponseDto;
+import org.example.boardservice.dto.*;
 import org.example.boardservice.exception.BoardNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -82,6 +79,7 @@ public class BoardService {
                 .orElse(null);
     }
 
+    @Transactional
     public void saveBoard(String userId, String title, String content, MultipartFile file){
         String filePath = fileService.storeFile(file);
 
@@ -102,6 +100,7 @@ public class BoardService {
                 );
     }
 
+    @Transactional
     public void updateBoard(long id, BoardUpdateRequestDto dto){
         Board board = boardRepository.findById(id)
                 .orElseThrow(
@@ -114,5 +113,15 @@ public class BoardService {
         }
 
         board.update(dto.getTitle(),dto.getContent(),filePath);
+    }
+
+    @Transactional
+    public void deleteBoard(long id, BoardDeleteRequestDto dto){
+        Board board = boardRepository.findById(id)
+                .orElseThrow(
+                        ()-> new BoardNotFoundException("[BOARD] 삭제할 게시글을 찾을 수 없습니다. Id = "+id)
+                );
+        boardRepository.deleteById(id);
+        fileService.deleteFile(dto.getFilePath());
     }
 }

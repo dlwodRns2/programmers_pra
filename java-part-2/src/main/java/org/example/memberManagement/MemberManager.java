@@ -61,7 +61,11 @@ public class MemberManager {
     }
     public void printAll(){
         for(int i=0;i<members.size();i++){
-            members.get(i).printInfo();
+            if(members.size()==0){
+                System.out.println("등록된 회원이 없습니다.");
+            }else{
+                members.get(i).printInfo();
+            }
         }
     }
 
