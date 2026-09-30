@@ -8,7 +8,7 @@ import org.example.authservice.config.jwt.TokenProvider;
 import org.example.authservice.config.jwt.TokenStatus;
 import org.example.authservice.domain.entity.User;
 import org.example.authservice.dto.RefreshTokenResponseDto;
-import org.example.authservice.dto.SignupPayloadDto;
+import org.example.authservice.dto.SignUpPayloadDto;
 import org.example.authservice.util.CookieUtil;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +46,7 @@ public class TokenService {
                 .build();
     }
 
-    public SignupPayloadDto getSignupPayload(String token){
+    public SignUpPayloadDto getSignupPayload(String token){
         return tokenProvider.getSignupPayload(token);
     }
     public String getRefreshToken(Cookie[] cookies){

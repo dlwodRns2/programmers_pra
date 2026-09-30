@@ -1,8 +1,16 @@
 package org.example.authservice.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.example.authservice.config.filter.TokenAuthenticationFilter;
+import org.example.authservice.config.oauth2.OAuth2FailureHandler;
+import org.example.authservice.config.oauth2.OAuth2SuccessHandler;
+import org.example.authservice.service.CustomOAuth2UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -11,17 +19,31 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
+
+    @Value("${web-service.url}")
+    private String webServiceUrl;
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http){
-         http
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http
                 .csrf(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -32,20 +54,73 @@ public class SecurityConfig {
                                 "/api/users/join",
                                 "/api/users/login",
                                 "/api/tokens/refresh",
-                                "/api/users/oauth-join"
+                                "/api/users/oauth-join",
+                                "/api/users/names",
+                                "/error"
                         ).permitAll()
                         .anyRequest().authenticated()
+                )
+                .oauth2Login(
+                        oauth2 -> oauth2
+                                .userInfoEndpoint(
+                                        userInfo -> userInfo
+                                                .userService(customOAuth2UserService)
+                                )
+                                .successHandler(oAuth2SuccessHandler)
+                                .failureHandler(oAuth2FailureHandler)
+                )
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception ->  exception
+                        .accessDeniedHandler(accessDeniedHandler())
+                        .authenticationEntryPoint(authenticationEntryPoint())
                 );
-         return http.build();
+
+        return http.build();
     }
 
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration){
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.withDefaultRolePrefix() // "ROLE_" 접두사 자동 부착
+                .role("ADMIN").implies("USER")
+                .build();
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return ((request, response, accessDeniedException) -> {
+            if ( request.getRequestURI().startsWith("/api") ) {
+                sendError( response, HttpServletResponse.SC_FORBIDDEN, "접근 권한이 없습니다." );
+            } else {
+                response.sendRedirect(webServiceUrl + "/access-denied");
+            }
+        });
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return ((request, response, authException) -> {
+            if ( request.getRequestURI().startsWith("/api") ) {
+                sendError( response, HttpServletResponse.SC_UNAUTHORIZED, "인증이 필요합니다." );
+            } else {
+                response.sendRedirect(webServiceUrl + "/access-denied");
+            }
+        });
+    }
+
+    private void sendError(HttpServletResponse response, int status, String message) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("status code : " + status + ", message : " + message);
+    }
+
 }

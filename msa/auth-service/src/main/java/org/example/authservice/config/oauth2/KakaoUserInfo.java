@@ -14,9 +14,8 @@ import java.util.Map;
 //   }
 
 public record KakaoUserInfo(
-        Map<String,Object> attributes
-) implements OAuth2UserInfo{
-
+        Map<String, Object> attributes
+) implements OAuth2UserInfo {
     @Override
     public String id() {
         Object id = attributes.get("id");
@@ -32,7 +31,7 @@ public record KakaoUserInfo(
     @Override
     public String name() {
         Map<String, Object> nickname = profile();
-        return nickname == null ? null : String.valueOf( nickname.get("name") );
+        return nickname == null ? null : String.valueOf( nickname.get("nickname") );
     }
 
     @Override
@@ -42,7 +41,7 @@ public record KakaoUserInfo(
     }
 
     private Map<String, Object> kakaoAccount() {
-        return (Map<String, Object>) attributes.get("kakao account");
+        return (Map<String, Object>) attributes.get("kakao_account");
     }
 
     private Map<String, Object> profile() {

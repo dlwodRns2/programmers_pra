@@ -1,5 +1,6 @@
 package org.example.authservice.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.authservice.config.jwt.JwtProperties;
@@ -10,6 +11,8 @@ import org.example.authservice.service.UserService;
 import org.example.authservice.util.CookieUtil;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,28 +32,59 @@ public class UserApiController {
                 .build();
     }
 
-    @PostMapping("/login")
-    public SignInResponseDto login(
-            @RequestBody SignInRequestDto signInRequestDto,
+    @PostMapping("/oauth-join")
+    public SignInResponseDto oauthJoin(
+            @RequestBody OAuthSignUpRequestDto requestDto,
             HttpServletResponse response
-    ){
-        SignInResponseDto loggedIn = userService.login(signInRequestDto);
+    ) {
+
+        SignInResponseDto signInResponseDto = userService.oauthSignUp(requestDto);
 
         CookieUtil.addCookie(
                 response,
                 CookieUtil.REFRESH_TOKEN_COOKIE,
-                loggedIn.getRefreshToken(),
+                signInResponseDto.getRefreshToken(),
+                (int) jwtProperties.getRefreshTokenValidity().toSeconds()
+        );
+        signInResponseDto.setRefreshToken(null);
+
+        return signInResponseDto;
+    }
+
+    @PostMapping("/login")
+    public SignInResponseDto login(
+            @RequestBody SignInRequestDto signInRequestDto,
+            HttpServletResponse response
+    ) {
+
+        SignInResponseDto logined = userService.login(signInRequestDto);
+
+        CookieUtil.addCookie(
+                response,
+                CookieUtil.REFRESH_TOKEN_COOKIE,
+                logined.getRefreshToken(),
                 (int) jwtProperties.getRefreshTokenValidity().toSeconds()
         );
 
-        loggedIn.setRefreshToken(null);
+        logined.setRefreshToken(null);
 
-        return loggedIn;
+        return logined;
+    }
 
+    @PostMapping("/logout")
+    public LogoutResponseDto logout(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        CookieUtil.deleteCookie(request, response, CookieUtil.REFRESH_TOKEN_COOKIE);
+        return LogoutResponseDto.builder()
+                .url("/users/login")
+                .message("로그아웃이 되었습니다.")
+                .build();
     }
 
     @GetMapping("/info")
-    public UserInfoResponseDto getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public UserInfoResponseDto getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
         User user = userDetails.getUser();
         return UserInfoResponseDto.builder()
                 .id(user.getId())
@@ -58,6 +92,24 @@ public class UserApiController {
                 .userName(user.getName())
                 .role(user.getRole())
                 .build();
+    }
+
+    @GetMapping("/names")
+    public List<UserNameResponseDto> getUserNames(@RequestParam List<String> userIds) {
+        return userService.getUserNames(userIds);
+    }
+
+    @DeleteMapping("/me")
+    public WithDrawResponseDto withdraw(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        WithDrawResponseDto dto = userService.withDraw(userDetails.getUser().getUserId());
+
+        CookieUtil.deleteCookie(request, response, CookieUtil.REFRESH_TOKEN_COOKIE);
+
+        return dto;
     }
 
 }

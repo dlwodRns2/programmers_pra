@@ -13,7 +13,7 @@ import org.example.authservice.config.oauth2.OAuth2UserInfo;
 import org.example.authservice.config.security.CustomUserDetails;
 import org.example.authservice.domain.entity.Role;
 import org.example.authservice.domain.entity.User;
-import org.example.authservice.dto.SignupPayloadDto;
+import org.example.authservice.dto.SignUpPayloadDto;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -27,6 +27,7 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 public class TokenProvider {
+
     private static final String CLAIM_ID = "id";
     private static final String CLAIM_NAME = "name";
     private static final String CLAIM_ROLE = "role";
@@ -48,14 +49,15 @@ public class TokenProvider {
         this.jwtParser = Jwts.parser().verifyWith(secretKey).build();
     }
 
-    public String generateToken(User user, Duration expiredAt){
+    public String generateToken(User user, Duration expiredAt ) {
         Date now = new Date();
         return makeToken(
                 user,
-                new Date(now.getTime() + expiredAt.toMillis())
+                new Date( now.getTime() + expiredAt.toMillis() )
         );
     }
-    private String makeToken(User user, Date expire){
+
+    private String makeToken( User user, Date expire) {
         return Jwts.builder()
                 .header().type("JWT").and()
                 .issuer(jwtProperties.getIssuer())
@@ -69,7 +71,7 @@ public class TokenProvider {
                 .compact();
     }
 
-    public TokenStatus validateToken(String  token){
+    public TokenStatus validateToken( String token ) {
         try {
             jwtParser.parseSignedClaims(token);
             log.debug("Token is valid");
@@ -98,6 +100,7 @@ public class TokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
     public Authentication getAuthentication(User user, String token) {
 
         CustomUserDetails principal = CustomUserDetails.builder()
@@ -125,7 +128,7 @@ public class TokenProvider {
     }
 
     // 가입 토큰 검증 + 클레임 복원
-    public SignupPayloadDto getSignupPayload(String token) {
+    public SignUpPayloadDto getSignupPayload(String token) {
         Claims claims;
         try {
             claims = getClaims(token);
@@ -137,11 +140,12 @@ public class TokenProvider {
             throw new IllegalArgumentException("가입 토큰이 아닙니다.");
         }
 
-        return new SignupPayloadDto(
+        return new SignUpPayloadDto(
                 AuthProvider.valueOf( claims.get(CLAIM_PROVIDER, String.class) ),
                 claims.getSubject(),
                 claims.get(CLAIM_EMAIL, String.class),
                 claims.get(CLAIM_NAME, String.class)
         );
     }
+
 }
