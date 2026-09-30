@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.boardservice.config.SecurityConfig;
 import org.example.boardservice.config.jwt.TokenProvider;
 import org.example.boardservice.config.jwt.TokenStatus;
 import org.example.boardservice.config.security.CustomUserDetails;
@@ -28,31 +27,34 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
-        log.debug("requestURI: {}",requestURI);
+        log.debug("requestURI: {}", requestURI);
 
         String token = resolveToken(request);
-        log.debug("token: {}",token);
+        log.debug("token: {}", token);
 
-        if(token != null){
+        if ( token != null ) {
+
             TokenStatus status = tokenProvider.validateToken(token);
-            log.debug("Token status: {}",status);
-            if(status==TokenStatus.VALID){
+            log.debug("Token status: {}", status);
+            if ( status == TokenStatus.VALID ) {
                 CustomUserDetails userDetails = tokenProvider.getTokenDetails(token);
 
-                Authentication authentication = tokenProvider.getAuthentication(userDetails,token);
+                Authentication authentication = tokenProvider.getAuthentication(userDetails, token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            }else if(status==TokenStatus.EXPIRED){
-                log.warn("{}, Token is expired",requestURI);
+            } else if ( status == TokenStatus.EXPIRED ) {
+                log.warn("{}, Token is expired", requestURI);
             }
         }
-        filterChain.doFilter(request,response);
+
+        filterChain.doFilter(request, response);
     }
 
-    private String resolveToken(HttpServletRequest request){
+    private String resolveToken(HttpServletRequest request) {
+
         // Authorization 헤더에서 JWT토큰 추출
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if(bearerToken != null && bearerToken.startsWith("Bearer ")){
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return null;

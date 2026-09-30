@@ -18,16 +18,15 @@ import java.util.List;
 @Getter
 @Builder
 public class CustomUserDetails implements UserDetails {
-
-    private Long id;
-    private String userId;
-    private String userName;
-    private String role;
+    private Long id;         // 계정 PK (auth-service DB 기준)
+    private String userId;   // 로그인 아이디 (토큰의 sub)
+    private String userName; // 표시 이름
+    private String role;     // "ROLE_USER" / "ROLE_ADMIN"
 
     // 이 사용자가 가진 권한 목록. AuthorizationFilter가 인가 판단할 때 사용한다.
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        return List.of( new SimpleGrantedAuthority(role) );
     }
 
     // 토큰 인증에는 비밀번호가 없다 — 비밀번호 대조는 로그인 시점에 auth-service가 이미 끝냈다

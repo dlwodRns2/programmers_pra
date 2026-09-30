@@ -18,16 +18,18 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CommentService {
+
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
 
     @Transactional
-    public void addComment(Long boardId, CommentWriteRequestDto dto){
-        //1. 게시글 찾기
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(()-> new BoardNotFoundException("Board Not Found. Id: "+boardId));
+    public void addComment(Long boardId, CommentWriteRequestDto dto) {
 
-        //2. Comment 저장
+        // 게시글을 먼저 찾는다.
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardNotFoundException("Board not found. Id: " + boardId));
+
+        // comment 저장
         Comment comment = Comment.builder()
                 .content(dto.getContent())
                 .userId(dto.getUserId())
@@ -35,6 +37,9 @@ public class CommentService {
                 .created(LocalDateTime.now())
                 .build();
         commentRepository.save(comment);
-        log.info("댓글 등록: commentId: {}",comment.getId());
+
+        log.info("댓글 등록 : commentId : {}", comment.getId());
     }
+
+
 }

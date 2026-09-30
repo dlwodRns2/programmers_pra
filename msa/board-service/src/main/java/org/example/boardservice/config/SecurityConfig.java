@@ -1,7 +1,5 @@
 package org.example.boardservice.config;
 
-import com.querydsl.core.annotations.Config;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.boardservice.config.filter.TokenAuthenticationFilter;
@@ -26,47 +24,54 @@ public class SecurityConfig {
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize
+                .sessionManagement( session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests( authorize -> authorize
                         .requestMatchers(
                                 "/api/boards/file/download/**",
-                                //서버 간 내부 API
+                                // 서버 간 내부 API
                                 "/api/boards/internal/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/error"
+                                "/error" // 에러 포워딩 경로. 막으면 401응답이 다시 401을 만드는 루프가 발생.
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
                 // jwt filter 적용
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-
-                .exceptionHandling(exception -> exception
+                // exceptionHandling 적용
+                // - 401 (미인증) : authenticationEntryPoint
+                // - 403 (권한부족) : accessDeniedHandler
+                .exceptionHandling( exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint())
                         .accessDeniedHandler(accessDeniedHandler())
                 );
+
         return http.build();
     }
 
     @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint(){
-        return ((request,response,authException)->
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return ((request, response, authException) ->
                 sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "인증이 필요합니다."));
     }
+
     @Bean
-    public AccessDeniedHandler accessDeniedHandler(){
+    public AccessDeniedHandler accessDeniedHandler() {
         return ((request, response, authException) ->
-                sendError(response,HttpServletResponse.SC_FORBIDDEN, "접근 권한이 없습니다."));
+                sendError(response, HttpServletResponse.SC_FORBIDDEN, "접근 권한이 없습니다."));
     }
+
     private void sendError(HttpServletResponse response, int status, String message) throws IOException {
         response.setStatus(status);
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("status code: "+status+ ", message: "+message);
+        response.getWriter().write("status code : " + status + ", message : " + message);
     }
+
 }

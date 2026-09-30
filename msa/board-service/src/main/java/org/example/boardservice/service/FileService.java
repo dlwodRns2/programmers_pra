@@ -19,12 +19,11 @@ public class FileService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    public String storeFile(MultipartFile file){
-        if(file==null||file.isEmpty()){
-            return null;
-        }
+    public String storeFile(MultipartFile file) {
 
-        try{
+        if ( file == null || file.isEmpty() ) return null;
+
+        try {
             // 절대 경로로 다뤄 실행 위치에 영향받지 않게 한다.
             File dir = new File(uploadDir).getAbsoluteFile();
             if ( !dir.exists() ) dir.mkdirs();
@@ -37,12 +36,13 @@ public class FileService {
             log.info("파일 저장 : originalFileName = {}, storedFileName = {}", file.getOriginalFilename(), storedFileName);
 
             return dest.getPath();
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new IllegalStateException("파일 저장에 실패 했습니다", e);
         }
     }
 
-    public Resource downloadFile(String fileName){
+    public Resource downloadFile(String fileName) {
+
         try {
             File file = new File( new File(uploadDir).getAbsoluteFile(), fileName );
 
@@ -59,9 +59,11 @@ public class FileService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
-    public void deleteFile(String filePath){
+    public void deleteFile(String filePath) {
+
         if ( filePath == null || filePath.isBlank() ) return;
 
         File file = new File(filePath);
@@ -71,5 +73,7 @@ public class FileService {
         if ( !deleted ) {
             log.warn("첨부파일 삭제 실패(디스에 남음) : filePath = {} ", filePath);
         }
+
     }
+
 }

@@ -4,11 +4,11 @@ spring:
   application:
     name: board-service
   config:
-    import: "optional:configserver:http://localhost:8888"
+    import: "optional:configserver:${config-service.url:http://localhost:8888}"
   datasource:
-    url: jdbc:mysql://localhost:3306/board_app?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+    url: "${db.url:jdbc:mysql://localhost:3306/board_app?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8}"
     username: root
-    password: re00
+    password: 1234
   servlet:
     multipart:
       max-file-size: 10MB

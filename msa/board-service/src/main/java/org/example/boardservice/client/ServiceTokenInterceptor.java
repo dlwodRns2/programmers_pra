@@ -5,13 +5,12 @@ import feign.RequestTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-//* Feign RequestInterceptor - 이 서비스의 "모든" Feign 요청 직전에 호출되는 훅
-//서비스 간 인증 토큰(X-Service-Token)을 매 요청에 자동으로 실어 보낸다.
+// * Feign RequestInterceptor - 이 서비스의 "모든" Feign 요청 직전에 호출되는 훅
+// 서비스 간 인증 토큰(X-Service-Token)을 매 요청에 자동으로 실어 보낸다.
 
-//(서블릿)Filter vc Interceptor
-//1. Filter : 스프링의 DispatcherServlet보다 "앞"에서 동작
-//2. Interceptor : DispatcherServlet "뒤", 컨트롤러의 앞단에서 동작한다
-
+// (서블릿)Filter vs Interceptor
+// Filter : 스프링의 DispatcherServlet(분배기)보다 "앞" 에서 동작한다.
+// Interceptor : DispatcherServlet "뒤", 컨트롤러의 앞단에서 동작한다.
 
 @Component
 public class ServiceTokenInterceptor implements RequestInterceptor {
@@ -23,6 +22,6 @@ public class ServiceTokenInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
-        template.header(SERVICE_TOKEN_HEADER,serviceToken);
+        template.header(SERVICE_TOKEN_HEADER, serviceToken);
     }
 }
