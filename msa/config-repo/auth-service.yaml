@@ -6,5 +6,5 @@ spring:
       client:
         registration:
           kakao:
-            client-id: ${KAKAO_CLIENT_ID:fb44fad539553103bcb93d798526b34a}
-            client-secret: D9fPyIeIdrpT2ShB5Vaksm0V0nPBmX1u
+            client-id: ${KAKAO_CLIENT_ID:8bebdb359ea7b81bf511567372c41d74}
+            client-secret: W1iQymKr201yL498596ZbAbqluIQSIzC
