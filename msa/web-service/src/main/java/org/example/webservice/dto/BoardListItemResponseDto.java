@@ -17,6 +17,6 @@ public class BoardListItemResponseDto {
     private String userName;
     private Long commentCount;
 
-    @JsonFormat(pattern = "yyyy-mm-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime created;
 }
