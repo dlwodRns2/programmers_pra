@@ -1,0 +1,51 @@
+name: msa-data
+
+networks:
+  msa-network:
+    name: msa-network
+
+services:
+  mysql:
+    image: mysql:9.4
+    container_name: mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8b4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: re00
+
+    #포트 매핑 : "호스트 포트 : 컨테이너 포트"
+    #컨테이너 내부 MYSQL은 3306에서 동작
+    #호스트(내 PC)에서 3307로 접속 -> 컨테이너 내부 3306으로 접속
+    ports:
+      - "3307:3306"
+      -
+    #볼룸 마운트 "왼쪽 : 오른쪽[:옵션]"
+    #왼쪽 : 물리저장소 - 파일이 실제로 쌓이는 곳
+    #오른쪽 : 논리 주소 - 컨테이너 안에서 그 저장소가 보이는 경로
+    volumes:
+      #1) 초기화 SQL 스크립트 전달
+      # 왼쪽 : 호스트(내 PC)의 실제 폴더
+      # 오른쪽 : 그 폴더가 컨테이너 안에서 보일 경로
+      - ./db:/docker-entrypoint-initdb.d:ro
+      #2) DB 데이터 보관
+      - mysql-data:/var/lib/mysql
+
+    # 헬스체크
+    # - mysqladmin ping 으로 실제 MySQL 서버가 실제 응답 여부를 확인해서 healty / unhealthy 상태를 판단.
+    # - 다른 서비스에서 depends_on + codition: service_healthy 로 활용 가능
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p1234"]
+      interval: 5s # 5초마다 체크
+      timeout: 3s # 3초 안에 응답 없으면 실패로 간주
+      retries: 20 # 20회 실패하면 unhealthy로 간주
+
+    # 네트워크 설정
+    # - 이 컨테이너가 msa-network에 연결되도록 설정
+    # - 같은 네트워크에 있는 컨테이너끼리는 "서버스 이름"으로 서로를 찾을 수 있다.
+    networks:
+      - msa-network
+#named volumes 선언
+#named volume은 컨테이너가 삭제되어도 데이터가 유지됨
+volumes:
+  mysql-data: {}
