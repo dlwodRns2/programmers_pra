@@ -10,12 +10,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
+
     private final BoardClient boardClient;
 
     public void addComment(
             String authorization,
             long boardId,
-            CommentWriteRequestDto dto){
-        boardClient.addComment(authorization, boardId, dto);
+            CommentWriteRequestDto requestDto
+    ){
+        boardClient.addComment(authorization, boardId, requestDto);
     }
+
 }

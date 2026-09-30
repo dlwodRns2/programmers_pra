@@ -10,14 +10,16 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/boards/{boardId}/comments")
 public class CommentApiController {
+
     private final CommentService commentService;
 
     @PostMapping
     public void addComment(
-            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false)String authorization,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
             @PathVariable long boardId,
             @RequestBody CommentWriteRequestDto dto
-            ){
-        commentService.addComment(authorization,boardId,dto);
+    ) {
+        commentService.addComment(authorization, boardId, dto);
     }
+
 }

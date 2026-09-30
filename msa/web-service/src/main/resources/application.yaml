@@ -4,6 +4,3 @@ server:
 spring:
   application:
     name: web-service
-
-edge-service:
-  url: http://localhost:8000

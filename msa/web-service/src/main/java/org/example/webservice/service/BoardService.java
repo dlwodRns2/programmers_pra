@@ -4,23 +4,28 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.webservice.client.BoardClient;
 import org.example.webservice.dto.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardService {
+
     private final BoardClient boardClient;
 
-    public BoardPageResponseDto searchBoard(String authorization, BoardSearchRequestDto condition, int page, int size){
+    public BoardPageResponseDto searchBoard(String authorization, BoardSearchRequestDto condition, int page, int size) {
         return boardClient.searchBoards(authorization, condition, page, size);
     }
 
-    public BoardWithCommentsResponseDto getBoardWithComments(String authorization, long id){
+    public BoardWithCommentsResponseDto getBoardWithComments(String authorization, Long id) {
         return boardClient.getBoardWithComments(authorization, id);
     }
-    public void saveBoard(String authorization, BoardWriteRequestDto dto){
+
+    public void saveBoard( String authorization, BoardWriteRequestDto dto ) {
         boardClient.saveBoard(
                 authorization,
                 dto.getTitle(),
@@ -29,15 +34,16 @@ public class BoardService {
                 emptyToNull(dto.getFile())
         );
     }
-    private MultipartFile emptyToNull(MultipartFile file){
+
+    private MultipartFile emptyToNull(MultipartFile file) {
         return (file == null || file.isEmpty()) ? null : file;
     }
 
-    public BoardDetailResponseDto getBoardDetail(String authorization, long id){
+    public BoardDetailResponseDto getBoardDetail(String authorization, long id) {
         return boardClient.getBoardDetail(authorization, id);
     }
 
-    public void updateBoard(String authorization, long id, BoardUpdateRequestDto dto){
+    public void updateBoard(String authorization, long id, BoardUpdateRequestDto dto) {
         boardClient.updateBoard(
                 authorization,
                 id,
@@ -48,7 +54,15 @@ public class BoardService {
         );
     }
 
-    public void deleteBoard(String authorization, long id, BoardDeleteRequestDto dto){
+    public void deleteBoard(String authorization, long id, BoardDeleteRequestDto dto) {
         boardClient.deleteBoard(authorization, id, dto);
+    }
+
+    public ResponseEntity<byte[]> downloadFile(String authorization, String fileName) {
+        return boardClient.downloadFile(authorization, fileName);
+    }
+
+    public List<BoardAuthorStatsResponseDto> getAuthorStats(String authorization, long minCount) {
+        return boardClient.getAuthorStats(authorization, minCount);
     }
 }

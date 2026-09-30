@@ -8,26 +8,32 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class BoardController {
+
     @GetMapping("/")
-    public String boardList(){
+    public String boardList() {
         return "board/board-list";
     }
 
     @GetMapping("/detail")
-    public String getBoardDetail(@RequestParam("id") Long id,
-                                 Model model){
+    public String getBoardDetail(@RequestParam("id") Long id, Model model) {
+        model.addAttribute("id", id);
         return "board/board-detail";
     }
 
     @GetMapping("/write")
-    public String write(){
+    public String write() {
         return "board/board-write";
     }
 
     @GetMapping("/update/{id}")
-    public String update(@PathVariable Long id, Model model){
-        model.addAttribute("id",id);
+    public String update(@PathVariable Long id, Model model) {
+        model.addAttribute("id", id);
         return "board/board-update";
+    }
+
+    @GetMapping("/stats")
+    public String stats() {
+        return "board/board-stats";
     }
 
 }

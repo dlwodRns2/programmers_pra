@@ -7,14 +7,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/users")
 public class AuthController {
+
     @GetMapping("/join")
-    public String join(){
-        return "/auth/sign-up";
+    public String join() {
+        return "auth/sign-up";
     }
 
     @GetMapping("/login")
-    public String login(){
-        return "/auth/login";
+    public String login() {
+        return "auth/login";
     }
 
+    @GetMapping("/oauth-join")
+    public String oauthJoin() {
+        return "auth/oauth-join";
+    }
 }

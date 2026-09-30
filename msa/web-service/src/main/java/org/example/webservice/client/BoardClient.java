@@ -5,23 +5,28 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 // 헤더를 파라미터로 받는 이유
 // Feign은 서블릿 요청과 무관한 새 HTTP 요청을 만들기 때문에,
 // 브라우저 web-service에 보낸 Authorization/Cookie 헤더가 자동으로 따라가지 않는다.
 // 컨트롤러가 받은 값을 명시적으로 넘겨줘야 auth-service까지 전달된다.
-@FeignClient(value="board-service", url="${edge-service.url:http://localhost:8000}")
+
+@FeignClient(value = "board-service", url = "${edge-service.url:http://localhost:8000}")
 public interface BoardClient {
+
     // @SpringQueryMap
     // DTO필드를 ?title=...&userId=... 쿼리스트링으로 펼쳐준다.(null 필드는 생략)
     @GetMapping("/api/boards/search")
     BoardPageResponseDto searchBoards(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
             @SpringQueryMap BoardSearchRequestDto condition,
-            @RequestParam("page")int page,
-            @RequestParam("size")int size
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
     );
 
     @GetMapping("/api/boards/{id}/with-comments")
@@ -39,16 +44,16 @@ public interface BoardClient {
 
     @PostMapping(value = "/api/boards", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     void saveBoard(
-            @RequestHeader(HttpHeaders.AUTHORIZATION)String authorization,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
             @RequestPart("userId") String userId,
-            @RequestPart(value = "file", required = false)MultipartFile file
-            );
+            @RequestPart(value = "file", required = false) MultipartFile file
+    );
 
     @GetMapping("/api/boards/{id}")
     BoardDetailResponseDto getBoardDetail(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String Authorization,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
             @PathVariable long id
     );
 
@@ -58,7 +63,7 @@ public interface BoardClient {
             @PathVariable long id,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
-            @RequestPart(value = "file",required = false) MultipartFile file,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             @RequestPart("fileFlag") String fileFlag
     );
 
@@ -67,5 +72,17 @@ public interface BoardClient {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
             @PathVariable long id,
             @RequestBody BoardDeleteRequestDto dto
+    );
+
+    @GetMapping("/api/boards/file/download/{fileName}")
+    ResponseEntity<byte[]> downloadFile(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+            @PathVariable String fileName
+    );
+
+    @GetMapping("/api/boards/stats/authors")
+    List<BoardAuthorStatsResponseDto> getAuthorStats(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+            @RequestParam long minCount
     );
 }
