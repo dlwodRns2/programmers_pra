@@ -1,16 +1,15 @@
 package org.example.webservice.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.example.webservice.client.BoardClient;
 import org.example.webservice.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardService {

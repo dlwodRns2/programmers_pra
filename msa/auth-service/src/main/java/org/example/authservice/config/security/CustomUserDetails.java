@@ -3,6 +3,7 @@ package org.example.authservice.config.security;
 import lombok.Builder;
 import lombok.Getter;
 import org.example.authservice.domain.entity.User;
+import org.example.authservice.domain.entity.UserStatus;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,5 +33,12 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return user.getUserId();
+    }
+
+    // 탈퇴(WITHDRAWING/WITHDRAWN) 계정은 비활성으로 취급
+    // -> DaoAuthenticationProvider가 비밀번호 검사 전에 DisabledException을 던져 로그인이 막힌다.
+    @Override
+    public boolean isEnabled() {
+        return user.getStatus() == UserStatus.ACTIVE;
     }
 }
